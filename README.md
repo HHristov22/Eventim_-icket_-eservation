@@ -1,4 +1,4 @@
-# Event Ticket Reservation Automation System
+# Event Ticket Reservation Automation System (https://www.eventim.bg/bg/)
 ## The project is an event ticket reservation automation system that aims to simplify and streamline the process of buying tickets for events. The system is designed to work based on pre-set preferences and available days of the user. The system will automatically book tickets for the user and send a confirmation email once the booking is complete.
 
 ### The system will consist of several components:
