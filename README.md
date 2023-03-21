@@ -14,5 +14,5 @@ The system will have a user interface where users can enter their preferences, s
 
 - The system's main objective is to provide a hassle-free and efficient way of reservation tickets for events. By automating the process, users can save time and effort, and they can be sure that they will get the best available tickets based on their preferences and budget.
 
-TODO:
+Upcoming feature:
 - Payment Gateway
