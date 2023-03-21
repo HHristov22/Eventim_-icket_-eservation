@@ -16,3 +16,4 @@ The system will have a user interface where users can enter their preferences, s
 
 Upcoming feature:
 - Payment Gateway
+- Work in background
