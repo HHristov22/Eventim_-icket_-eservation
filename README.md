@@ -1,5 +1,5 @@
 # Event Ticket Reservation Automation System (https://www.eventim.bg/bg/)
-## The project is an event ticket reservation automation system that aims to simplify and streamline the process of buying tickets for events. The system is designed to work based on pre-set preferences and available days of the user. The system will automatically book tickets for the user and send a confirmation email once the booking is complete.
+## The project is an event ticket reservation automation system that aims to simplify and streamline the event ticket booking process. The system is designed to work based on predefined user preferences. The system will automatically reserve tickets for the user and send a confirmation email once the reservation is complete.
 
 ### The system will consist of several components:
 
@@ -17,3 +17,39 @@ The system will have a user interface where users can enter their preferences, s
 Upcoming feature:
 - Payment Gateway
 - Work in background
+____
+## Architecture for the Eventim Ticket Reservatione system:
+```
+         +-----------------------------------+
+         |             Web Browser           |
+         +-----------------------------------+
+                   | HTTP Requests
+                   v
+         +-----------------------------------+
+         |      GUI / Web Application        |
+         +-----------------------------------+
+                   | Interacts with:
+                   | - Database
+                   | - Payment Processor (optional)
+                   | - AI Bot for Seats
+                   | - AI Bot for Event Recommendations
+                   v
+         +-----------------------------------+
+         |            Database               |
+         +-----------------------------------+
+                   | Stores data related to:
+                   | - Users
+                   | - Events
+                   | - Reservations
+                   v
+         +-----------------------------------+
+         |           Backend GUI             |
+         +-----------------------------------+
+                   | Provides a UI for managing events and reservations
+                   v
+        +------------------|         |-----------------------|
+        | AI Bot for Seat  |         | AI Bot for Event      |
+        | Selection        |<------->|                       |
+        +------------------|         |-----------------------+
+
+```
