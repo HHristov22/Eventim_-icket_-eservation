@@ -1,66 +1,76 @@
 import sqlite3
 
-def openDataBase(database):
-    conn = sqlite3.connect(database)
-    return conn
+class DatabaseCom:
+    def __init__(self, databaseName):
+        self.databaseName = databaseName;
+        
+    def openDataBase(self):
+        conn = sqlite3.connect(self.databaseName)
+        cursor = conn.execute("SELECT type, name, location, date, time, price, availability from EVENT")
+        return cursor
 
-def createCursor(database):
-    conn = openDataBase(database)
-    cursor = conn.execute("SELECT type, name, location, date, time, price, availability from EVENT")
-    return cursor
+    def getEventList(self):
+        cursor = self.openDataBase()
+        eventList = cursor.fetchall()
+        return eventList
 
-def getEventList(database):
-    cursor = createCursor(database)
-    eventsList = cursor.fetchall()
-    return eventsList
-
-def getNumberOfEvents(database):
-    cursor = createCursor(database)
-    eventsList = cursor.fetchall()
-    return len(eventsList)
+    def getNumberOfEvents(self):
+        eventList = self.getEventList()
+        return len(eventList)
 
 class Preferences:
-
-    def __init__(self, types, dates, times, numberOfTickets, priceRange):
-        self.types = types
-        self.dates = dates
-        self.times = times
-        self.numberOfTickets = numberOfTickets
-        self.priceRange = priceRange
     
-def initUserPreferences():
-    fileWithUserPrefs = open("userPref.txt", "r", encoding = 'utf-8-sig')
-    lines = fileWithUserPrefs.readlines()
-    fileWithUserPrefs.close()
-
-    preferencesDict = {}
-    my_list = []
-    for line in lines:
-        line = line.split(',')
-        line = [i.strip() for i in line]
-        my_list.append(line);
-
-    return Preferences(my_list[0], my_list[1], my_list[2], my_list[3], my_list[4]) 
-
-def savePreferredEventToFile (event):
-    f = open("preferredEvents.txt", "a")
-    for i in range(len(event)):
-        f.write(str(event[i]) + ' ')
+    def __init__(self, filename):
+        self.filename = filename    
         
-    f.write("\n")
-    f.close()
-
-def reservation(numberOfEvents, eventsList, userPreferences):
-    for i in range(numberOfEvents):
-        if  eventsList[i][0] in userPreferences.types and \
-            eventsList[i][3] in userPreferences.dates and \
-            eventsList[i][4] in userPreferences.times and \
-            eventsList[i][5] > int(userPreferences.priceRange[0]) and eventsList[i][5] < int(userPreferences.priceRange[1]) and\
-            eventsList[i][6] > int(max(userPreferences.numberOfTickets)):
-            savePreferredEventToFile(eventsList[i])
-            print("Reservation...")
+    def createUserPreferencesList(self):
+        fileWithUserPrefs = open(self.filename, "r", encoding = 'utf-8-sig')
+        lines = fileWithUserPrefs.readlines()
+        fileWithUserPrefs.close()
         
-numberOfEvents = getNumberOfEvents('eventDatabase.db')
-eventsList = getEventList('eventDatabase.db')
-userPreferences = initUserPreferences()
-reservation(numberOfEvents, eventsList, userPreferences)
+        tempList = []
+        for line in lines:
+            line = line.split(',')
+            line = [i.strip() for i in line]
+            tempList.append(line);
+            
+        return tempList
+        # (tempList[0] = types, tempList[1] = dates, tempList[2] = times, tempList[3] = numberOfTickets, tempList[4] = priceRange) 
+
+class Reservation:
+    def __init__(self, preferencesList):
+        self.preferencesList = preferencesList
+        
+    def checkEvent(self, event):
+        return  event[0] in self.preferencesList[0] and \
+                event[3] in self.preferencesList[1] and \
+                event[4] in self.preferencesList[2] and \
+                event[5] > int(self.preferencesList[4][0]) and event[5] < int(self.preferencesList[4][1]) and \
+                event[6] > int(max(self.preferencesList[3]))
+    
+    def savePreferredEventToFile (self, event):
+        f = open("preferredEvents.txt", "a")
+        for i in range(len(event)):
+            f.write(str(event[i]) + ' ')
+            
+        f.write("\n")
+        f.close()
+    
+    def reservation(self, eventsList, numberOfEvents):
+        for i in range(numberOfEvents):
+            if(self.checkEvent(eventsList[i])):
+                self.savePreferredEventToFile(eventsList[i])
+                print("Reservation...")
+                
+                
+    
+pref = Preferences ("userPref.txt")
+userPreferencesList = pref.createUserPreferencesList()
+
+database = DatabaseCom("eventDatabase.db")
+eventsList = database.getEventList()
+numberOfEvents = database.getNumberOfEvents()
+
+res = Reservation(userPreferencesList)
+res.reservation(eventsList, numberOfEvents)
+
