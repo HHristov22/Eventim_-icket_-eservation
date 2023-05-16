@@ -1,6 +1,6 @@
 import sqlite3
 
-class DatabaseCom:
+class DatabaseConnecting:
     def __init__(self, databaseName):
         self.databaseName = databaseName;
         
@@ -63,11 +63,10 @@ class Reservation:
                 print("Reservation...")
                 
                 
-    
 pref = Preferences ("userPref.txt")
 userPreferencesList = pref.createUserPreferencesList()
 
-database = DatabaseCom("eventDatabase.db")
+database = DatabaseConnecting("eventDatabase.db")
 eventsList = database.getEventList()
 numberOfEvents = database.getNumberOfEvents()
 
