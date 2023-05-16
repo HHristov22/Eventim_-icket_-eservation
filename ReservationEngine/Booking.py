@@ -71,16 +71,21 @@ class Booking:
             print("Error navigating to the event:", str(e))
 
 
-booking = Booking()
+def main():
+    booking = Booking()
 
-driver = booking.driverConnect()
-print("Driver object returned successfully!")
-pageName = "https://www.eventim.bg/bg/"
-booking.openHalls(pageName, driver)
-wantedHall = "София"
-booking.openWantedHall(driver, wantedHall)
-# href="/bg/bileti/koncert-gregorianski-pesnopeniya-sofiya-siti-mark-art-centr-595194/event.html" как ще построим този линк от името на събитието?
-eventName = "/bg/bileti/cska-balkan-sofiya-basketbolna-zala-594635/event.html"
-booking.goToEvent(driver, eventName)
+    driver = booking.driverConnect()
+    print("Driver object returned successfully!")
+    pageName = "https://www.eventim.bg/bg/"
+    booking.openHalls(pageName, driver)
+    wantedHall = "София"
+    booking.openWantedHall(driver, wantedHall)
+    # href="/bg/bileti/koncert-gregorianski-pesnopeniya-sofiya-siti-mark-art-centr-595194/event.html" как ще построим този линк от името на събитието?
+    eventName = "/bg/bileti/cska-balkan-sofiya-basketbolna-zala-594635/event.html"
+    booking.goToEvent(driver, eventName)
 
-# date and time format: 2023-05-15T19:00:00+03:00
+    # date and time format: 2023-05-15T19:00:00+03:00
+
+
+if __name__ == "__main__":
+    main()
