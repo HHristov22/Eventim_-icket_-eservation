@@ -1,54 +1,38 @@
-import sqlite3 as sql
 from user_data import UserData
+from database_manager_interface import DatabaseInterface
+from query_creator import QueryCreator
+from query_executor import QueryExecutor
+import database_constants as dbc
 
-class Database :
+class Database(DatabaseInterface) :
 
-    def __init__(self) -> None:
-        pass
-
-    def initialize(self, databaseFilePath : str) :
-        self._connectToDatabase(databaseFilePath)
+    def __init__(self, databaseFilePath : str) -> None:
+        self.executor = QueryExecutor(databaseFilePath)
         self._createUsersTableIfNotPresent()
 
-    def _connectToDatabase(self, databaseFilePath : str) :
-        self.connection = sql.connect(databaseFilePath)
-        self.cursor = self.connection.cursor()
-
     def _createUsersTableIfNotPresent(self) :
-        self.cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            username TEXT PRIMARY KEY,
-            password TEXT NOT NULL,
-            eventimEmail TEXT NOT NULL UNIQUE,
-            eventimPassword TEXT
-        );
-        """)
-    
-    def getAllTableNames(self) :
-        tableNames = self.cursor.execute("""
-            SELECT name FROM sqlite_schema
-            WHERE type='table';
-        """).fetchone()
-        if(tableNames is None) :
-            tableNames = list()
-        return tableNames
-    
-    def removeTable(self, tableName : str) :
-        self.cursor.execute("""
-            DROP TABLE IF EXISTS '{}';
-        """.format(tableName))
+        columnNamesAndDefinitionPairs = list()
+        columnNamesAndDefinitionPairs.append((dbc.USER_TABLE_USERNAME_COLUMN, dbc.USER_TABLE_USERNAME_COLUMN_DEFINITION))
+        columnNamesAndDefinitionPairs.append((dbc.USER_TABLE_PASSWORD_COLUMN, dbc.USER_TABLE_PASSWORD_COLUMN_DEFINITION))
+        columnNamesAndDefinitionPairs.append((dbc.USER_TABLE_EVENTIM_EMAIL_COLUMN, dbc.USER_TABLE_EVENTIM_EMAIL_COLUMN_DEFINITION))
+        columnNamesAndDefinitionPairs.append((dbc.USER_TABLE_EVENTIM_PASSWORD_COLUMN, dbc.USER_TABLE_EVENTIM_PASSWORD_COLUMN_DEFINITION))
+        query = QueryCreator.createTable(dbc.USER_TABLE, columnNamesAndDefinitionPairs)
+        self.executor.execute(query)
 
     def insertUser(self, user : UserData) :
-        self.cursor.execute("""
-        INSERT INTO users ('username', 'password', 'eventimEmail', 'eventimPassword')
-        VALUES ('{}', '{}', '{}', '{}');
-        """.format(user.username, user.password, user.eventimEmail, user.eventimPassword))
+        columnValuePairs = list()
+        columnValuePairs.append((dbc.USER_TABLE_USERNAME_COLUMN, user.username))
+        columnValuePairs.append((dbc.USER_TABLE_PASSWORD_COLUMN, user.password))
+        columnValuePairs.append((dbc.USER_TABLE_EVENTIM_EMAIL_COLUMN, user.eventimEmail))
+        columnValuePairs.append((dbc.USER_TABLE_EVENTIM_PASSWORD_COLUMN, user.eventimPassword))
+        query = QueryCreator.insertInto(dbc.USER_TABLE,columnValuePairs)
+        self.executor.execute(query)
 
     def getAllUsers(self) -> list :
         users = list()
-        usersFromDatabase = self.cursor.execute("""
-        SELECT *,ROWID FROM users;
-        """).fetchall()
+        query = QueryCreator.select(dbc.USER_TABLE, ['*','ROWID'])
+        self.executor.execute(query)
+        usersFromDatabase = self.executor.fetchall()
 
         for userFromDatabase in usersFromDatabase :
             newUser = UserData(
@@ -62,24 +46,15 @@ class Database :
         return users
     
     def deleteUser(self, username : str) :
-        self.cursor.execute("""
-        DELETE FROM users
-        WHERE username='{}';
-        """.format(username))
+        query = QueryCreator.delete(dbc.USER_TABLE, "{}='{}'".format(dbc.USER_TABLE_USERNAME_COLUMN, username))
+        self.executor.execute(query)
 
     def updateUser(self, username : str, updatedData : UserData) :
-        self.cursor.execute("""
-        UPDATE users
-        SET username='{}', password='{}', eventimEmail='{}', eventimPassword='{}'
-        WHERE username='{}';
-        """.format(
-            updatedData.username,
-            updatedData.password,
-            updatedData.eventimEmail,
-            updatedData.eventimPassword,
-            username
-        ))
-    
-    def commitAndCloseConnection(self) :
-        self.connection.commit()
-        self.connection.close()
+        columnValuePairs = list()
+        columnValuePairs.append((dbc.USER_TABLE_USERNAME_COLUMN, updatedData.username))
+        columnValuePairs.append((dbc.USER_TABLE_PASSWORD_COLUMN, updatedData.password))
+        columnValuePairs.append((dbc.USER_TABLE_EVENTIM_EMAIL_COLUMN, updatedData.eventimEmail))
+        columnValuePairs.append((dbc.USER_TABLE_EVENTIM_PASSWORD_COLUMN, updatedData.eventimPassword))
+        condition = "{}='{}'".format(dbc.USER_TABLE_USERNAME_COLUMN, username)
+        query = QueryCreator.update(dbc.USER_TABLE, columnValuePairs, condition)
+        self.executor.execute(query)
