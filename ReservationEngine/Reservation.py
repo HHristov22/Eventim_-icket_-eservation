@@ -1,3 +1,5 @@
+from Booking import Booking
+
 class Reservation:
     def __init__(self, preferencesList):
         self.preferencesList = preferencesList
@@ -25,9 +27,20 @@ class Reservation:
             f.close()
         except IOError as e:
             print("Error saving the preferred event to file:", str(e))
+            
+    def formattingLocation(self, rowLocation):
+        formattedSentence = "-".join(rowLocation.split())
+        return formattedSentence
 
     def reservation(self, eventsList, numberOfEvents):
         for i in range(numberOfEvents):
-            if self.checkEvent(eventsList[i]):
-                self.savePreferredEventToFile(eventsList[i])
-                print("Reservation...")
+            try:
+                if self.checkEvent(eventsList[i]):
+                    self.savePreferredEventToFile(eventsList[i])
+                    eventName = eventsList[i][1]
+                    formatedEventLocation = self.formattingLocation(eventsList[i][2])
+                    book = Booking()
+                    book.booking(eventName, formatedEventLocation)
+            except Exception as e:
+                print("Error occurred during the reservation process: ", str(e))
+

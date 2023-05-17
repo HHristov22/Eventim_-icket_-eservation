@@ -2,6 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from typing import Final
+
+PAGE_NAME: Final[str] = "https://www.eventim.bg/bg/"
 
 class Booking:
     
@@ -23,8 +26,8 @@ class Booking:
             return None
         
         
-    def openHalls(self, pageName, driver):
-        driver.get(pageName)
+    def openHalls(self, driver):
+        driver.get(PAGE_NAME)
         driver.maximize_window()
 
         try:
@@ -57,32 +60,39 @@ class Booking:
             print("Error opening the wanted hall:", str(e))    
             
             
-    def goToEvent(self, driver, eventName):
+    def goToEvent(self, driver, eventName, eventLocation):
         try:
             allEventInHallLinks = driver.find_elements("xpath", "//div[contains(@class, 'a-tabPanel')]")
             for event_link in allEventInHallLinks:
                 links = event_link.find_elements("xpath", "//a[@href]")
                 for link in links:
-                    if eventName in link.get_attribute("href"):
+                    if eventName in link.get_attribute("href") and eventLocation in link.get_attribute("href"):
                         link.click()
                         return  
-            print("Event not found:", eventName)
+            print("Event not found:", eventName, "in", eventLocation)
         except Exception as e:
             print("Error navigating to the event:", str(e))
 
+    def booking(self, eventName, eventLocation):
+        driver = self.driverConnect()
+        print("Driver object returned successfully!")
+        self.openHalls(driver)
+        wantedHall = "София"
+        self.openWantedHall(driver, wantedHall)
+        self.goToEvent(driver, eventName, eventLocation)
+        driver.close()
 
 def main():
     booking = Booking()
 
     driver = booking.driverConnect()
     print("Driver object returned successfully!")
-    pageName = "https://www.eventim.bg/bg/"
-    booking.openHalls(pageName, driver)
+    booking.openHalls(driver)
     wantedHall = "София"
     booking.openWantedHall(driver, wantedHall)
-    # href="/bg/bileti/koncert-gregorianski-pesnopeniya-sofiya-siti-mark-art-centr-595194/event.html" как ще построим този линк от името на събитието?
-    eventName = "/bg/bileti/cska-balkan-sofiya-basketbolna-zala-594635/event.html"
-    booking.goToEvent(driver, eventName)
+    eventName = "cska"
+    eventLocation = "balkan-sofiya-basketbolna-zala"
+    booking.goToEvent(driver, eventName, eventLocation)
 
     # date and time format: 2023-05-15T19:00:00+03:00
 
