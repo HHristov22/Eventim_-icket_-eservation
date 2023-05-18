@@ -2,9 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-from typing import Final
-
-PAGE_NAME: Final[str] = "https://www.eventim.bg/bg/"
+from selenium.common.exceptions import NoSuchElementException
+from BookingConstants import PAGE_NAME, ACCEPT, HALLS
 
 class Booking:
     
@@ -26,76 +25,78 @@ class Booking:
             return None
         
         
-    def openHalls(self, driver):
-        driver.get(PAGE_NAME)
-        driver.maximize_window()
-
+    def acceptCookies(self, driver):
         try:
             linksForCookies = driver.find_elements("xpath", "//div[contains(@class, 'cookie-policy-action')]")
             for link in linksForCookies:
-                if "Приемам" in link.get_attribute("innerHTML"):
+                if ACCEPT in link.get_attribute("innerHTML"):
                     link.click()
                     break
         except Exception as e:
             print("Error handling cookies:", str(e))
+        
+        
+    def openHalls(self, driver):
+        driver.get(PAGE_NAME)
+        driver.maximize_window()
+        self.acceptCookies(driver)
 
         try:
-            mainLinks = driver.find_elements("xpath", "//a[@href]")
-            for link in mainLinks:
-                if "Зали" in link.get_attribute("innerHTML"):
-                    link.click()
-                    break
-        except Exception as e:
-            print("Error opening halls:", str(e))
+            link = driver.find_element("xpath", "//a[contains(text(), '{}')]".format(HALLS))
+            link.click()
+        except NoSuchElementException:
+            print("Halls link not found")
             
             
-    def openWantedHall(self, driver, wantedHall):
+    def openCityHall(self, driver, cityHall):
         try:
-            hallsLinks = driver.find_elements("xpath", "//a[@href]")
-            for link in hallsLinks:
-                if wantedHall in link.get_attribute("innerHTML"):
-                    link.click()
-                    break
+            link = driver.find_element("xpath", "//a[contains(text(), '{}')]".format(cityHall))
+            link.click()
+        except NoSuchElementException:
+            print("City hall not found:", cityHall)
         except Exception as e:
-            print("Error opening the wanted hall:", str(e))    
+            print("Error opening the wanted hall:", str(e))   
             
             
     def goToEvent(self, driver, eventName, eventLocation):
         try:
-            allEventInHallLinks = driver.find_elements("xpath", "//div[contains(@class, 'a-tabPanel')]")
-            for event_link in allEventInHallLinks:
-                links = event_link.find_elements("xpath", "//a[@href]")
-                for link in links:
-                    if eventName in link.get_attribute("href") and eventLocation in link.get_attribute("href"):
-                        link.click()
-                        return  
+            event_link = driver.find_element("xpath", "//div[contains(@class, 'a-tabPanel')]//a[contains(@href, '{}')\
+                                                and contains(@href, '{}')]".format(eventName, eventLocation))
+            event_link.click()
+        except NoSuchElementException:
             print("Event not found:", eventName, "in", eventLocation)
         except Exception as e:
             print("Error navigating to the event:", str(e))
 
-    def booking(self, eventName, eventLocation):
+    
+    def findPrefferedDateAndTime(self, driver, formatedDateAndTime):
+        try:
+            meta_tag = driver.find_element("xpath", "//div[@class='o-eventList']//meta[contains(@content, '{}')]".format(formatedDateAndTime))
+            content = meta_tag.get_attribute("content")
+            element = driver.find_element("xpath", "//a[@class='m-eventListItem']")
+            href = element.get_attribute('href')
+            element.click()
+            return
+        except NoSuchElementException:
+            pass
+    
+    def booking(self, city,  eventName, eventLocation, prefferedDateAndTime):
         driver = self.driverConnect()
         print("Driver object returned successfully!")
         self.openHalls(driver)
-        wantedHall = "София"
-        self.openWantedHall(driver, wantedHall)
+        self.openCityHall(driver, city)
         self.goToEvent(driver, eventName, eventLocation)
+        self.findPrefferedDateAndTime(driver, prefferedDateAndTime )
         driver.close()
+        print("Driver closed successfully!")
+        
 
 def main():
-    booking = Booking()
-
-    driver = booking.driverConnect()
-    print("Driver object returned successfully!")
-    booking.openHalls(driver)
-    wantedHall = "София"
-    booking.openWantedHall(driver, wantedHall)
+    book = Booking()
     eventName = "cska"
     eventLocation = "balkan-sofiya-basketbolna-zala"
-    booking.goToEvent(driver, eventName, eventLocation)
-
-    # date and time format: 2023-05-15T19:00:00+03:00
-
-
+    prefferedDateAndTime = "2023-05-19T19:00:00+03:00"
+    book.booking("София" , eventName, eventLocation, prefferedDateAndTime)
+    
 if __name__ == "__main__":
     main()

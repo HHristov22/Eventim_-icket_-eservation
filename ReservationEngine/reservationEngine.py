@@ -12,7 +12,9 @@ def main():
     numberOfEvents = database.getNumberOfEvents()
 
     res = Reservation(userPreferencesList)
-    res.reservation(eventsList, numberOfEvents)
+    city = "София" # todo
+    prefferedDateAndTime = "2023-05-19T19:00:00+03:00" # todo
+    res.reservation(city, eventsList, numberOfEvents, prefferedDateAndTime)
 
 if __name__ == "__main__":
     main()

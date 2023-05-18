@@ -32,7 +32,7 @@ class Reservation:
         formattedSentence = "-".join(rowLocation.split())
         return formattedSentence
 
-    def reservation(self, eventsList, numberOfEvents):
+    def reservation(self, city, eventsList, numberOfEvents, prefferedDateAndTime):
         for i in range(numberOfEvents):
             try:
                 if self.checkEvent(eventsList[i]):
@@ -40,7 +40,7 @@ class Reservation:
                     eventName = eventsList[i][1]
                     formatedEventLocation = self.formattingLocation(eventsList[i][2])
                     book = Booking()
-                    book.booking(eventName, formatedEventLocation)
+                    book.booking(city, eventName, formatedEventLocation, prefferedDateAndTime)
             except Exception as e:
                 print("Error occurred during the reservation process: ", str(e))
 
