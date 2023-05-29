@@ -15,22 +15,24 @@ class EventPage(tk.Frame):
         self.ticket_var = tk.StringVar()
 
         self.event_dropdown = tk.OptionMenu(self, self.event_var, "")
+        self.event_label = tk.Label(self,text="Event: ")
         self.start_date_entry = tk.Entry(self, textvariable=self.start_date_var)
         self.end_date_entry = tk.Entry(self, textvariable=self.end_date_var)
         self.ticket_dropdown = tk.OptionMenu(self, self.ticket_var, "")
         self.submit_button = tk.Button(self, text="Submit", command=self.submit_data)
         self.back_button = tk.Button(self, text="Back", command=self.back_callback)
 
-        self.event_dropdown.pack()
-        self.start_date_entry.pack(padx=150)
-        self.end_date_entry.pack()
-        self.ticket_dropdown.pack()
-        self.submit_button.pack()
-        self.back_button.pack()
+        self.event_dropdown.pack(pady=2)
+        self.event_label.pack(pady=2)
+        self.start_date_entry.pack(padx=150,pady=2)
+        self.end_date_entry.pack(pady=2)
+        self.ticket_dropdown.pack(pady=2)
+        self.submit_button.pack(pady=2)
+        self.back_button.pack(pady=2)
 
         self.populate_event_dropdown()
         self.populate_ticket_dropdown()
-
+    
     def populate_event_dropdown(self):
         # Placeholder implementation to populate the event dropdown
         events = ["Event 1", "Event 2", "Event 3"]
@@ -38,11 +40,14 @@ class EventPage(tk.Frame):
         menu = self.event_dropdown["menu"]
         menu.delete(0, "end")
         for event in events:
-            menu.add_command(label=event, command=lambda value=event: self.event_var.set(value))
+            menu.add_command(label=event, command=lambda value=event: self.update_selected_event(value))
+
+    def update_selected_event(self, event):
+        self.event_label.config(text="Event: " + event)
 
     def populate_ticket_dropdown(self):
         # Placeholder implementation to populate the ticket dropdown
-        tickets = [1, 2, 3, 4, 5]
+        tickets = [1, 2, 3, 4, 5, 6, 7, 8]
         self.ticket_var.set(tickets[0])  # Set default value
         menu = self.ticket_dropdown["menu"]
         menu.delete(0, "end")
