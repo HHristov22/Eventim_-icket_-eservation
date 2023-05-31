@@ -6,7 +6,7 @@ The DatabaseConnector class makes connect with database
 The getEventList method makes list of events using the database
 '''
 
-class DatabaseConnecting:
+class DatabaseConnector:
     def __init__(self, databaseName):
         self.databaseName = databaseName
         

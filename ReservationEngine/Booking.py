@@ -46,6 +46,7 @@ class Booking:
                     break
         except Exception as e:
             print("Error handling cookies:", str(e))
+            return None
         
         
     def openHalls(self, driver):
@@ -58,6 +59,7 @@ class Booking:
             link.click()
         except NoSuchElementException:
             print("Halls link not found")
+            return None
             
             
     def openCityHall(self, driver, cityHall):
