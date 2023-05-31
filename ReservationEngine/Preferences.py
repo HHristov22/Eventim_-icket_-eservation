@@ -1,3 +1,7 @@
+''' 
+The Preferences class makes list ot preferences by file content
+'''
+
 class Preferences:
     def __init__(self, filename):
         self.filename = filename    

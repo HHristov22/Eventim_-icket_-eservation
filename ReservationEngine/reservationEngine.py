@@ -3,6 +3,10 @@ from DatabaseConnecting import DatabaseConnecting
 from Reservation import Reservation
 from Preferences import Preferences
 
+'''
+main logic 
+'''
+
 def main():
     pref = Preferences("userPref.txt")
     userPreferencesList = pref.createUserPreferencesList()

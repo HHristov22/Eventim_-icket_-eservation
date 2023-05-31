@@ -5,6 +5,18 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
 from BookingConstants import PAGE_NAME, ACCEPT, HALLS
 
+'''
+The Booking class books a ticket through the website.
+
+The driverConnect method does establish a connection between the application and the browser.
+The acceptCookies method accepts the cookies after opening the website.
+The openHalls method does open the halls menu
+The openCityHall method does go to specific halls, based on prefered city
+The goToEvent method finds preffered event
+The findPrefferedDateAndTime method finds preffered date and time 
+The booking method books the selected event
+'''
+
 class Booking:
     
     def __init__(self):
@@ -93,9 +105,9 @@ class Booking:
 
 def main():
     book = Booking()
-    eventName = "cska"
-    eventLocation = "balkan-sofiya-basketbolna-zala"
-    prefferedDateAndTime = "2023-05-19T19:00:00+03:00"
+    eventName = "svobodno-padashchi-istorii"
+    eventLocation = "theatro-otsam-kanala"
+    prefferedDateAndTime = "2023-06-04T20:00:00+03:00"
     book.booking("София" , eventName, eventLocation, prefferedDateAndTime)
     
 if __name__ == "__main__":

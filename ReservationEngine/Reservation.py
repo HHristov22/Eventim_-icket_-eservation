@@ -1,5 +1,12 @@
 from Booking import Booking
 
+'''
+Reservation class calls Booking`s method to make the reservation 
+The formatingLocation method does format the location. Put them '-'
+The checkEvent method checks if event is preffered by preferences of user
+
+'''
+
 class Reservation:
     def __init__(self, preferencesList):
         self.preferencesList = preferencesList

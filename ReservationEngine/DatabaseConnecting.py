@@ -1,5 +1,11 @@
 import sqlite3
 
+'''
+The DatabaseConnector class makes connect with database
+
+The getEventList method makes list of events using the database
+'''
+
 class DatabaseConnecting:
     def __init__(self, databaseName):
         self.databaseName = databaseName
