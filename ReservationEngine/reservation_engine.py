@@ -1,7 +1,7 @@
 import sqlite3
-from DatabaseConnecting import DatabaseConnecting
-from Reservation import Reservation
-from Preferences import Preferences
+from database_connecting import DatabaseConnecting
+from reservation import Reservation
+from preferences import Preferences
 
 '''
 main logic 

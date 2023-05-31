@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
-from BookingConstants import PAGE_NAME, ACCEPT, HALLS
+from booking_constants import PAGE_NAME, ACCEPT, HALLS
 
 '''
 The Booking class books a ticket through the website.

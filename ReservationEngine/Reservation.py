@@ -1,4 +1,4 @@
-from Booking import Booking
+from booking import Booking
 
 '''
 Reservation class calls Booking`s method to make the reservation 
