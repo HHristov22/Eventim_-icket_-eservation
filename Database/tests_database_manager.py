@@ -14,8 +14,11 @@ class TestDatabase(unittest.TestCase) :
         testUser = UserData("testUser", "testPassword", "testEventimEmail", "testEventimPassword")
         db.insertUser(testUser)
 
+        user = db.getUser("testUser")
+        self.assertEqual(user, testUser, "Inserted user not found")
+
         users = db.getAllUsers()
-        self.assertIn(testUser, users, "Inserted user not found")
+        self.assertIn(testUser, users, "Get all user doesn't work")
 
         testUpdatedUser = UserData("testUpdatedUser", "testUpdatedPassword", "testUpdatedEventimEmail", "testUpdatedEventimPassword")
         db.updateUser(testUser.username, testUpdatedUser)

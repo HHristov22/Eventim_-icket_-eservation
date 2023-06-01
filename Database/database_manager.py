@@ -28,11 +28,17 @@ class Database(DatabaseInterface) :
         query = QueryCreator.insertInto(dbc.USER_TABLE,columnValuePairs)
         self.executor.execute(query)
 
+    def getUser(self, username: str) -> UserData:
+        sqlCondition = "{}='{}'".format(dbc.USER_TABLE_USERNAME_COLUMN, username)
+        query = QueryCreator.select(dbc.USER_TABLE, ['*'], sqlCondition)
+        result = self.executor.execute(query).fetch()
+        searchedUser = UserData(result[0], result[1], result[2], result[3])
+        return searchedUser
+
     def getAllUsers(self) -> list :
         users = list()
         query = QueryCreator.select(dbc.USER_TABLE, ['*','ROWID'])
-        self.executor.execute(query)
-        usersFromDatabase = self.executor.fetchall()
+        usersFromDatabase = self.executor.execute(query).fetchall()
 
         for userFromDatabase in usersFromDatabase :
             newUser = UserData(

@@ -11,8 +11,9 @@ class QueryExecutor :
         self.connection.commit()
         self.connection.close()
 
-    def execute(self, query : str) -> None :
+    def execute(self, query : str) :
         self.result = self.cursor.execute(query)
+        return self
 
     def fetch(self) :
         return self.result.fetchone()

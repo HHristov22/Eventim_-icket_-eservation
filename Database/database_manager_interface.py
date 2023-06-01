@@ -6,6 +6,8 @@ class DatabaseInterface(metaclass=abc.ABCMeta) :
     def __subclasshook__(cls, subclass: type) -> bool:
         return (hasattr(subclass, 'insertUser') and
                 callable(subclass.insertUser) and
+                hasattr(subclass, 'getUser') and
+                callable(subclass.getUser) and
                 hasattr(subclass, 'getAllUsers') and
                 callable(subclass.getAllUsers) and
                 hasattr(subclass, 'deleteUser') and
@@ -17,6 +19,10 @@ class DatabaseInterface(metaclass=abc.ABCMeta) :
     def insertUser(self, user : UserData) :
         raise NotImplementedError
     
+    @abc.abstractmethod
+    def getUser(self, username : str) -> UserData :
+        raise NotImplementedError
+
     @abc.abstractmethod
     def getAllUsers(self) -> list :
         raise NotImplementedError
