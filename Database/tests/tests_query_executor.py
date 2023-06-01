@@ -1,4 +1,6 @@
 import unittest
+import sys
+sys.path.append('..')
 from query_executor import QueryExecutor
 import os
 import sqlite3

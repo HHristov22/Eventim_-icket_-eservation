@@ -1,4 +1,6 @@
 import unittest
+import sys
+sys.path.append('..')
 from query_creator import QueryCreator
 
 class QueryCreatorUnitTests(unittest.TestCase) :
@@ -40,6 +42,11 @@ class QueryCreatorUnitTests(unittest.TestCase) :
     def testDelete(self) :
         createdQuery = QueryCreator.delete('someTable', "'someColumn'='someValue'")
         testQuery = "DELETE FROM 'someTable' WHERE 'someColumn'='someValue';"
+        self.assertEqual(createdQuery, testQuery)
+
+    def testDeleteWithoutWhere(self) :
+        createdQuery = QueryCreator.delete('someTable', "")
+        testQuery = "DELETE FROM 'someTable';"
         self.assertEqual(createdQuery, testQuery)
     
     def testUpdate(self) :
