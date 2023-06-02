@@ -4,7 +4,8 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
 from booking_constants import PAGE_NAME, ACCEPT, HALLS
-
+from selenium.webdriver.common.by import By
+import time
 '''
 The Booking class books a ticket through the website.
 '''
@@ -71,16 +72,38 @@ class Booking:
         except NoSuchElementException:
             pass
     
-    def booking(self, city,  eventName, eventLocation, prefferedDateAndTime):
+    
+    def __increasingAmount(self, numberOfTickets):
+        try:
+            stepper = self.driver.find_elements(By.CSS_SELECTOR, '[data-qa="stepper-increase"]')
+            for i in range(numberOfTickets):
+                stepper[0].click()
+                time.sleep(1) 
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            
+    
+    def __reservationTickets(self):
+        try:
+            button = self.driver.find_element(By.CSS_SELECTOR, 'button.a-button.-active.-fullWidth.-submit')
+            button.click()
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        
+    def booking(self, city,  eventName, eventLocation, prefferedDateAndTime, numberOfTickets):
         print("Driver object returned successfully!")
         self.__openHallsMenu()
         self.__chooseCityHall(city)
         self.__goToEvent(eventName, eventLocation)
         self.__findPrefferedDateAndTime(prefferedDateAndTime )
+        self.__increasingAmount(numberOfTickets)
+        self.__reservationTickets()
+        time.sleep(10)
         self.driver.close()
         print("Driver closed successfully!")
         
-
+        
 def main():
     options = Options()
     options.add_experimental_option("detach", True)
@@ -92,7 +115,8 @@ def main():
     eventName = "svobodno-padashchi-istorii"
     eventLocation = "theatro-otsam-kanala"
     prefferedDateAndTime = "2023-06-04T20:00:00+03:00"
-    book.booking("София" , eventName, eventLocation, prefferedDateAndTime)
+    numberOfTickets = 5
+    book.booking("София" , eventName, eventLocation, prefferedDateAndTime, numberOfTickets)
     
 if __name__ == "__main__":
-    main()
+    main()  
