@@ -1,4 +1,6 @@
-from user_data import UserData
+from data_types import User
+from data_types import EventimEvent
+from data_types import Preference
 import abc
 
 class DatabaseInterface(metaclass=abc.ABCMeta) :
@@ -16,21 +18,37 @@ class DatabaseInterface(metaclass=abc.ABCMeta) :
                 callable(subclass.updateUser))
     
     @abc.abstractmethod
-    def insertUser(self, user : UserData) :
+    def setUser(self, user : User) :
         raise NotImplementedError
     
     @abc.abstractmethod
-    def getUser(self, username : str) -> UserData :
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def getAllUsers(self) -> list :
+    def getUser(self) -> User :
         raise NotImplementedError
     
     @abc.abstractmethod
-    def deleteUser(self, username : str) :
+    def deleteUser(self) :
         raise NotImplementedError
-
+    
     @abc.abstractmethod
-    def updateUser(self, username : str, updatedData : UserData) :
+    def insertEventimEvent(self, eventimEvent : EventimEvent) :
+        raise NotImplementedError
+    
+    @abc.abstractmethod
+    def getAllEventimEvent(self) -> list :
+        raise NotImplementedError
+    
+    @abc.abstractmethod
+    def deleteAllEventimEvents(self) :
+        raise NotImplementedError
+    
+    @abc.abstractmethod
+    def setPreference(self, pref : Preference) :
+        raise NotImplementedError
+    
+    @abc.abstractmethod
+    def getPreference(self) :
+        raise NotImplementedError
+    
+    @abc.abstractmethod
+    def deletePreference(self) :
         raise NotImplementedError

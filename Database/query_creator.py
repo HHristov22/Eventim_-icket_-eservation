@@ -62,7 +62,11 @@ class QueryCreator :
         return query
     
     def delete(tableName : str, sqlCondition : str) -> str :
-        query = "DELETE FROM '{}' WHERE {};".format(tableName, sqlCondition)
+        if sqlCondition == "" :
+            query = "DELETE FROM '{}';".format(tableName)
+        else :
+            query = "DELETE FROM '{}' WHERE {};".format(tableName, sqlCondition)
+        
         return query
     
     def update(tableName : str, columnValuePairs : list, sqlCondition : str) -> str :
