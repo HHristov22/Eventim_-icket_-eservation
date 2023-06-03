@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support import expected_conditions as EC
 from booking_constants import PAGE_NAME, ACCEPT, HALLS
 from selenium.webdriver.common.by import By
 import time
@@ -85,23 +86,34 @@ class Booking:
     
     def __reservationTickets(self):
         try:
+            element = self.driver.find_element_by_class_name('a-ticketModeOption__indicatorCircle')
+            element.click()
             button = self.driver.find_element(By.CSS_SELECTOR, 'button.a-button.-active.-fullWidth.-submit')
             button.click()
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
-        
-    def booking(self, city,  eventName, eventLocation, prefferedDateAndTime, numberOfTickets):
-        print("Driver object returned successfully!")
-        self.__openHallsMenu()
-        self.__chooseCityHall(city)
-        self.__goToEvent(eventName, eventLocation)
-        self.__findPrefferedDateAndTime(prefferedDateAndTime )
-        self.__increasingAmount(numberOfTickets)
+
+    def booking(self, link, numberOfTickets):
+        self.driver.get('https://www.eventim.bg/bg/bileti/svetlio-the-legends-sofiya-stroeja-open-air-music-bar-1352917/performance.html')
+        self.driver.maximize_window()
+        self.__acceptCookies()
+        element = self.driver.find_element_by_class_name('a-Stepper__amount')
+
+        number = element.text
+        self.__increasingAmount(numberOfTickets - int(number))
         self.__reservationTickets()
-        time.sleep(10)
-        self.driver.close()
-        print("Driver closed successfully!")
+        
+        # print("Driver object returned successfully!")
+        # self.__openHallsMenu()
+        # self.__chooseCityHall(city)
+        # self.__goToEvent(eventName, eventLocation)
+        # self.__findPrefferedDateAndTime(prefferedDateAndTime )
+        # self.__increasingAmount(numberOfTickets)
+        # self.__reservationTickets()
+        # time.sleep(10)
+        # self.driver.close()
+        # print("Driver closed successfully!")
         
         
 def main():
@@ -116,7 +128,7 @@ def main():
     eventLocation = "theatro-otsam-kanala"
     prefferedDateAndTime = "2023-06-04T20:00:00+03:00"
     numberOfTickets = 5
-    book.booking("София" , eventName, eventLocation, prefferedDateAndTime, numberOfTickets)
+    book.booking('https://www.eventim.bg/bg/bileti/svetlio-the-legends-sofiya-stroeja-open-air-music-bar-1352917/performance.html', numberOfTickets)
     
 if __name__ == "__main__":
     main()  
