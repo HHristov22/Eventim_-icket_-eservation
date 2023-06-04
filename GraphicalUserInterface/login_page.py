@@ -1,11 +1,9 @@
+# Dosen't use
 import tkinter as tk
 from json_handler import read_users, encrypt_password
 
 class LoginPage(tk.Frame):
     def __init__(self, parent, registration_page):
-        """
-        shit
-        """
         super().__init__(parent)
         self.parent = parent
         self.username_entry_label = tk.Label(self,text="Email:")

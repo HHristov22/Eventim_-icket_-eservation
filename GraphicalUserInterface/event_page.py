@@ -1,3 +1,4 @@
+# Dosen't use
 import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime
@@ -91,8 +92,8 @@ class EventPage(tk.Frame):
             messagebox.showerror("Missing Fields", "Please fill in all the fields")
 
         # Clear the input fields
-        self.event_var.set("")
-        self.start_date_var.set("")
-        self.end_date_var.set("")
-        self.ticket_var.set("")
+        # self.event_var.set("")
+        # self.start_date_var.set("")
+        # self.end_date_var.set("")
+        # self.ticket_var.set("")
 
