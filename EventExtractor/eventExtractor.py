@@ -105,19 +105,71 @@ class Extractor:
         
         return links
     
+    def __getNameOfEvent(self):
+        name = self.driver.find_element("xpath", "/html/body/div[3]/div[3]/main/div/div[2]/div/div/article/div[2]/div/a[1]/div[2]/h3".format("name"))
+        return name.text
+        
     def saveConcertEvents(self):
         links = self.__extractAllLinksForConcerts()
-        concert_event_links = [] 
-        concert_event_names = []
+        concert_events_links = [] 
         for concertLink in links:
             self.driver.get(concertLink)
             anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
             for tag in anchor_tags:
                 link = tag.get_attribute("href")
                 if link and 'event' in link and 'bileti' in  link:
-                    concert_event_links.append(link)   
+                    concert_events_links.append(link)   
+                        
+    
+    def saveCultureEvents(self):
+        links = self.__extractAllLinksForCulture()
+        culture_events_links = [] 
+        for concertLink in links:
+            self.driver.get(concertLink)
+            anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
+            for tag in anchor_tags:
+                link = tag.get_attribute("href")
+                if link and 'event' in link and 'bileti' in  link:
+                    culture_events_links.append(link)   
                     
-        # print(len(concert_event_links))
+        
+    def saveSportEvents(self):
+        links = self.__extractAllLinksForSport()
+        sport_events_links = [] 
+        for concertLink in links:
+            self.driver.get(concertLink)
+            anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
+            for tag in anchor_tags:
+                link = tag.get_attribute("href")
+                if link and 'event' in link and 'bileti' in  link:
+                    sport_events_links.append(link)   
+                    
+    
+    def saveFamilyEvents(self):
+        links = self.__extractAllLinksForFamily()
+        family_events_links = [] 
+        for concertLink in links:
+            self.driver.get(concertLink)
+            anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
+            for tag in anchor_tags:
+                link = tag.get_attribute("href")
+                if link and 'event' in link and 'bileti' in  link:
+                    family_events_links.append(link)   
+                    
+        
+    def saveOtherEvents(self):
+        links = self.__extractAllLinksForOther()
+        other_events_links = [] 
+        for concertLink in links:
+            self.driver.get(concertLink)
+            anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
+            for tag in anchor_tags:
+                link = tag.get_attribute("href")
+                if link and 'event' in link and 'bileti' in  link:
+                    other_events_links.append(link)   
+                    
+    
+    
     
 def main():
     options = Options()
