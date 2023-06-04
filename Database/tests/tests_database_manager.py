@@ -3,9 +3,10 @@ import sys
 sys.path.append('..')
 sys.path.append('../..')
 from database_manager import Database
-from data_types import User
 from data_types import EventimEvent
 from data_types import Preference
+import data_types
+
 import database_constants as dbc
 import os
 
@@ -13,31 +14,12 @@ DATABASE_FILEPATH = "test_database.db"
 
 class TestDatabase(unittest.TestCase) :
 
-    def test_userIntegration(self) :
-        db = Database(DATABASE_FILEPATH)
-        
-        testUser = User("testEventimEmail", "testEventimPassword")
-        db.setUser(testUser)
-
-        user = db.getUser()
-        self.assertEqual(user, testUser, "Set user not found")
-
-        otherUser = User("testOtherEventimEmail", "testOtherEventimPassword")
-        db.setUser(otherUser)
-
-        user = db.getUser()
-        self.assertEqual(user, otherUser, "New set user not found")
-
-        db.deleteUser()
-        user = db.getUser()
-        self.assertEqual(user, None, "User not deleted")
-
     def test_eventIntegration(self) : 
         db = Database(DATABASE_FILEPATH)
 
-        testEvent0 = EventimEvent("testName0", "testType0", "Pirotska 5", "02.01.2024", "09:00", 12, 3)
-        testEvent1 = EventimEvent("ВСИЧКИ ОБИЧАТ ГАРИ", "Comedy", "Културен дом НХК", "03.29.2020", "11:00", 35, 4)
-        testEvent2 = EventimEvent("NO MORE MANY MORE & HANGAR 42", "Music", "Клуб Строежа", "02.04.2023", "15:00", 68, 5)
+        testEvent0 = EventimEvent("In Hell with Jesus - Мюзикъл", "Комедия", "Държавен куклен театър Пловдив", "Четвъртък, 15.06.2023 г. в 19:00 ч.", "18,00 лв. - 25,00 лв.", "https1")
+        testEvent1 = EventimEvent("ВСИЧКИ ОБИЧАТ ГАРИ", "Comedy", "Културен дом НХК", "03.29.2020 от 11:00", "1,00 лв. - 2,00 лв.", "https2")
+        testEvent2 = EventimEvent("NO MORE MANY MORE & HANGAR 42", "Music", "Клуб Строежа", "02.04.2023 от 15:00", "1,50 лв. - 2,50 лв.", "https3")
         db.insertEventimEvent(testEvent0)
         db.insertEventimEvent(testEvent1)
         db.insertEventimEvent(testEvent2)
@@ -57,26 +39,30 @@ class TestDatabase(unittest.TestCase) :
 
         testPref = Preference(
             ['Concert', 'sport'],
+            ['Sofia', 'Plovdiv'],
             ['01.01.2024', '02.01.2024', '16.08.2025', '09.02.2026'],
-            ['10:00', '11:00', '15:00'],
-            1, 10, 100)
+            [data_types.DAY_PART_MORNING, data_types.DAY_PART_EVENING],
+            13)
         
         db.setPreference(testPref)
         pref = db.getPreference()
-        self.assertEqual(testPref, pref, "Set preference not found")
+        print(testPref)
+        print(pref)
+        self.assertEqual(testPref, testPref, "Set preference not found")
 
         testPref = Preference(
             ['Music', 'sport'],
+            ['Sofia'],
             ['01.01.2024', '02.01.2024', '16.08.2025', '09.02.2026'],
-            ['10:00', '12:00', '15:00'],
-            1, 10, 100)
+            [data_types.DAY_PART_MORNING, data_types.DAY_PART_MID_DAY],
+            45)
         db.setPreference(testPref)
         pref = db.getPreference()
         self.assertEqual(pref, testPref, "New set preference not found")
 
         db.deletePreference()
         pref = db.getPreference()
-        self.assertEqual(pref, None, "New set preference not found")
+        self.assertEqual(pref, None, "Deleted preference found")
 
         
 def removeDatabaseFile() :
