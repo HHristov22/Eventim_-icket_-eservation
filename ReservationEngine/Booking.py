@@ -98,22 +98,7 @@ class Booking:
         self.driver.get('https://www.eventim.bg/bg/bileti/svetlio-the-legends-sofiya-stroeja-open-air-music-bar-1352917/performance.html')
         self.driver.maximize_window()
         self.__acceptCookies()
-        element = self.driver.find_element_by_class_name('a-Stepper__amount')
-
-        number = element.text
-        self.__increasingAmount(numberOfTickets - int(number))
-        self.__reservationTickets()
         
-        # print("Driver object returned successfully!")
-        # self.__openHallsMenu()
-        # self.__chooseCityHall(city)
-        # self.__goToEvent(eventName, eventLocation)
-        # self.__findPrefferedDateAndTime(prefferedDateAndTime )
-        # self.__increasingAmount(numberOfTickets)
-        # self.__reservationTickets()
-        # time.sleep(10)
-        # self.driver.close()
-        # print("Driver closed successfully!")
         
         
 def main():
