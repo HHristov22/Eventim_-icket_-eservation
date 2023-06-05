@@ -7,17 +7,17 @@ from selenium.webdriver.common.by import By
 import time
 import re
 import sys
-sys.path.append('../data_types.py')
-sys.path.append('../database_manager.py')
-import EventimEvent
-import Database
-
+sys.path.append('..')
+from data_types import EventimEvent
+# from Database.database_manager import Database
 from booking_constants import PAGE_NAME, ACCEPT, EVENTS, LIST_OF_LINKS
 
 class Extractor:
+    
     def __init__(self, driver):
         self.driver = driver
-
+        # self.database = database
+        
     def __connectWithWebPage(self):
         self.driver.get(PAGE_NAME)
         self.driver.maximize_window()
@@ -134,6 +134,11 @@ class Extractor:
         
         for concertLink in links:
             self.driver.get(concertLink)
+            try:
+                element = self.driver.find_element(By.XPATH, "//span[contains(@class, 'a-pagination_loadMoreLabel') and contains(text(), 'Покажи още')]")
+                element.click()
+            except NoSuchElementException:
+                print("All elements in page are loaded!")
             
             # Extract names
             h3_elements = self.driver.find_elements(By.TAG_NAME, "h3")
@@ -153,28 +158,40 @@ class Extractor:
                                 if tag.get_attribute("href") and 'event' in tag.get_attribute("href") and 'bileti' in tag.get_attribute("href"))
         
         # extract max prices
-        for link in events_links:
-            events_maxPrices.append(self.__maxPrice(link))        
+        for i in range(0, len(events_links)):
+            events_maxPrices.append(0)        
         
         for name, location, dateAndTime, maxPrice, link in zip(events_names, events_locations, events_datesAndTimes, events_maxPrices, events_links):
             newEvenet = EventimEvent(name, event_type, location, dateAndTime, maxPrice, link)
-            Database.insertEventimEvent(newEvenet)
+            print(newEvenet)
+            # Database.insertEventimEvent(newEvenet)
 
-    def saveEvenetsOfallType(self):
-        concertLinks = self.extractAllLinksForConcerts()
-        self.__saveEventsOfType(concertLinks, 'concert')
+    def saveEvenetsOfPrefferedTypes(self):
+        # prefferedType = self.database.getPreference()
+        prefferedType = ['', 'concert']
+        # prefferedType[1] = 'concert'
         
-        cultureLinks = self.extractAllLinksForCulture()
-        self.__saveEventsOfType(cultureLinks, 'culture')
-        
-        familyLinks = self.extractAllLinksForFamily()
-        self.__saveEventsOfType(familyLinks, 'family')
-        
-        sportLinks = self.extractAllLinksForSport()
-        self.__saveEventsOfType(sportLinks, 'sport')
-        
-        otherLinks = self.extractAllLinksForOther()
-        self.__saveEventsOfType(otherLinks, 'other')
+        if prefferedType[1]  == 'concert':
+            concertLinks = self.extractAllLinksForConcerts()
+            self.__saveEventsOfType(concertLinks, 'concert')
+            
+        elif prefferedType[1]  == 'family':
+            familyLinks = self.extractAllLinksForFamily()
+            self.__saveEventsOfType(familyLinks, 'family')
+            
+        elif prefferedType[1]  == 'culture':
+            cultureLinks = self.extractAllLinksForCulture()
+            self.__saveEventsOfType(cultureLinks, 'culture')
+            
+        elif prefferedType[1]  == 'sport':
+            sportLinks = self.extractAllLinksForSport()
+            self.__saveEventsOfType(sportLinks, 'sport')
+
+        elif prefferedType[1]  == 'other':
+            otherLinks = self.extractAllLinksForOther()
+            self.__saveEventsOfType(otherLinks, 'other')
+
+
 
 
 
@@ -186,7 +203,7 @@ def main():
     driver.implicitly_wait(10)  
 
     extractor = Extractor (driver)
-    extractor.saveEvenetsOfallType()
+    extractor.saveEvenetsOfPrefferedTypes()
 
     driver.close()
 
