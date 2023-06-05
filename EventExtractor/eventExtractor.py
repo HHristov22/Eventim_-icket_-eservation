@@ -4,6 +4,14 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+import time
+import re
+import sys
+sys.path.append('../data_types.py')
+sys.path.append('../database_manager.py')
+import EventimEvent
+import Database
+
 from booking_constants import PAGE_NAME, ACCEPT, EVENTS, LIST_OF_LINKS
 
 class Extractor:
@@ -35,7 +43,7 @@ class Extractor:
             print("events link not found")
             return None
         
-    def __extractAllLinksForConcerts(self) -> list:
+    def extractAllLinksForConcerts(self) -> list:
         self.__openEventsMenu()
         li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
         
@@ -49,7 +57,7 @@ class Extractor:
         
         return links
     
-    def __extractAllLinksForCulture(self) -> list:
+    def extractAllLinksForCulture(self) -> list:
         self.__openEventsMenu()
         li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
         
@@ -63,7 +71,7 @@ class Extractor:
         
         return links    
     
-    def __extractAllLinksForSport(self) -> list:
+    def extractAllLinksForSport(self) -> list:
         self.__openEventsMenu()
         li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
         
@@ -77,7 +85,7 @@ class Extractor:
         
         return links   
     
-    def __extractAllLinksForFamily(self) -> list:
+    def extractAllLinksForFamily(self) -> list:
         self.__openEventsMenu()
         li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
         
@@ -91,7 +99,7 @@ class Extractor:
         
         return links
     
-    def __extractAllLinksForOther(self) -> list:
+    def extractAllLinksForOther(self) -> list:
         self.__openEventsMenu()
         li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
         
@@ -105,72 +113,71 @@ class Extractor:
         
         return links
     
-    def __getNameOfEvent(self):
-        name = self.driver.find_element("xpath", "/html/body/div[3]/div[3]/main/div/div[2]/div/div/article/div[2]/div/a[1]/div[2]/h3".format("name"))
-        return name.text
+    def __maxPrice(self, event_link):
+        self.driver.get(event_link)
+        time.sleep(3)  # Wait for 3 seconds
+        button = self.driver.find_element(By.XPATH, '//*[@id="event_page"]/div[2]/article/div/div[2]/div/div/a/div[3]/button')
+        button.click()
+        elements = self.driver.find_elements(By.CSS_SELECTOR, ".o-singleTicketTypeSelection__options .m-priceLevel__title.-alternative")
         
-    def saveConcertEvents(self):
-        links = self.__extractAllLinksForConcerts()
-        concert_events_links = [] 
-        for concertLink in links:
-            self.driver.get(concertLink)
-            anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
-            for tag in anchor_tags:
-                link = tag.get_attribute("href")
-                if link and 'event' in link and 'bileti' in  link:
-                    concert_events_links.append(link)   
-                        
-    
-    def saveCultureEvents(self):
-        links = self.__extractAllLinksForCulture()
-        culture_events_links = [] 
-        for concertLink in links:
-            self.driver.get(concertLink)
-            anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
-            for tag in anchor_tags:
-                link = tag.get_attribute("href")
-                if link and 'event' in link and 'bileti' in  link:
-                    culture_events_links.append(link)   
-                    
+        stringPrices = [element.text for element in elements]
+        prices = [re.findall(r'\d+', s)[0] for s in stringPrices]
+
+        return max(prices)            
         
-    def saveSportEvents(self):
-        links = self.__extractAllLinksForSport()
-        sport_events_links = [] 
-        for concertLink in links:
-            self.driver.get(concertLink)
-            anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
-            for tag in anchor_tags:
-                link = tag.get_attribute("href")
-                if link and 'event' in link and 'bileti' in  link:
-                    sport_events_links.append(link)   
-                    
-    
-    def saveFamilyEvents(self):
-        links = self.__extractAllLinksForFamily()
-        family_events_links = [] 
-        for concertLink in links:
-            self.driver.get(concertLink)
-            anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
-            for tag in anchor_tags:
-                link = tag.get_attribute("href")
-                if link and 'event' in link and 'bileti' in  link:
-                    family_events_links.append(link)   
-                    
+    def __saveEventsOfType(self, links, event_type): # links - contanis all links for different type in one category
+        events_links = [] 
+        events_names = []
+        events_locations = []
+        events_datesAndTimes = []
+        events_maxPrices = []
         
-    def saveOtherEvents(self):
-        links = self.__extractAllLinksForOther()
-        other_events_links = [] 
         for concertLink in links:
             self.driver.get(concertLink)
-            anchor_tags = self.driver.find_elements(By.TAG_NAME, 'a')
-            for tag in anchor_tags:
-                link = tag.get_attribute("href")
-                if link and 'event' in link and 'bileti' in  link:
-                    other_events_links.append(link)   
-                    
-    
-    
-    
+            
+            # Extract names
+            h3_elements = self.driver.find_elements(By.TAG_NAME, "h3")
+            events_names.extend(element.get_attribute("innerHTML") for element in h3_elements)
+
+            # Extract locations
+            elements = self.driver.find_elements(By.CLASS_NAME, "m-eventListItem__venue")
+            events_locations.extend(element.text for element in elements)
+
+            # Extract dates and times
+            elements = self.driver.find_elements(By.CSS_SELECTOR, "*[itemprop='startDate']")
+            events_datesAndTimes.extend(element.get_attribute("content") for element in elements)
+            
+            # Extract links
+            elements = self.driver.find_elements(By.TAG_NAME, 'a')
+            events_links.extend(tag.get_attribute("href") for tag in elements 
+                                if tag.get_attribute("href") and 'event' in tag.get_attribute("href") and 'bileti' in tag.get_attribute("href"))
+        
+        # extract max prices
+        for link in events_links:
+            events_maxPrices.append(self.__maxPrice(link))        
+        
+        for name, location, dateAndTime, maxPrice, link in zip(events_names, events_locations, events_datesAndTimes, events_maxPrices, events_links):
+            newEvenet = EventimEvent(name, event_type, location, dateAndTime, maxPrice, link)
+            Database.insertEventimEvent(newEvenet)
+
+    def saveEvenetsOfallType(self):
+        concertLinks = self.extractAllLinksForConcerts()
+        self.__saveEventsOfType(concertLinks, 'concert')
+        
+        cultureLinks = self.extractAllLinksForCulture()
+        self.__saveEventsOfType(cultureLinks, 'culture')
+        
+        familyLinks = self.extractAllLinksForFamily()
+        self.__saveEventsOfType(familyLinks, 'family')
+        
+        sportLinks = self.extractAllLinksForSport()
+        self.__saveEventsOfType(sportLinks, 'sport')
+        
+        otherLinks = self.extractAllLinksForOther()
+        self.__saveEventsOfType(otherLinks, 'other')
+
+
+
 def main():
     options = Options()
     options.add_experimental_option("detach", True)
@@ -179,8 +186,7 @@ def main():
     driver.implicitly_wait(10)  
 
     extractor = Extractor (driver)
-    extractor.saveConcertEvents()
-
+    extractor.saveEvenetsOfallType()
 
     driver.close()
 
