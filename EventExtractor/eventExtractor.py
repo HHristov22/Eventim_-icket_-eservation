@@ -8,11 +8,10 @@ import time
 import re
 import sys
 sys.path.append('..')
-sys.path.append('../Database')
 
 from data_types import EventimEvent
-from database_manager import Database
-from booking_constants import PAGE_NAME, ACCEPT, EVENTS, LIST_OF_LINKS
+from Database.database_manager import Database
+from EventExtractor.booking_constants import PAGE_NAME, ACCEPT, EVENTS, LIST_OF_LINKS
 
 class Extractor:
     
@@ -166,11 +165,11 @@ class Extractor:
         for name, location, dateAndTime, maxPrice, link in zip(events_names, events_locations, events_datesAndTimes, events_maxPrices, events_links):
             newEvenet = EventimEvent(name, event_type, location, dateAndTime, maxPrice, link)
             print(newEvenet)
-            # Database.insertEventimEvent(newEvenet)
+            self.database.insertEventimEvent(newEvenet)
 
     def saveEvenetsOfPrefferedTypes(self):
-        # prefferedType = self.database.getPreference()
-        prefferedType = ['', 'concert']
+        prefferedType = self.database.getPreference()
+        #prefferedType = ['', 'concert']
         # prefferedType[1] = 'concert'
         
         if prefferedType[1]  == 'concert':

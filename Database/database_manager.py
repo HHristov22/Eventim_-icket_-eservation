@@ -1,9 +1,9 @@
 from data_types import EventimEvent
 from data_types import Preference
-from database_manager_interface import DatabaseInterface
-from query_creator import QueryCreator
-from query_executor import QueryExecutor
-import database_constants as dbc
+from Database.database_manager_interface import DatabaseInterface
+from  Database.query_creator import QueryCreator
+from  Database.query_executor import QueryExecutor
+import  Database.database_constants as dbc
 
 class Database(DatabaseInterface) :
 
