@@ -8,15 +8,17 @@ import time
 import re
 import sys
 sys.path.append('..')
+sys.path.append('../Database')
+
 from data_types import EventimEvent
-# from Database.database_manager import Database
+from database_manager import Database
 from booking_constants import PAGE_NAME, ACCEPT, EVENTS, LIST_OF_LINKS
 
 class Extractor:
     
-    def __init__(self, driver):
+    def __init__(self, driver, database: Database):
         self.driver = driver
-        # self.database = database
+        self.database = database
         
     def __connectWithWebPage(self):
         self.driver.get(PAGE_NAME)
@@ -132,8 +134,8 @@ class Extractor:
         events_datesAndTimes = []
         events_maxPrices = []
         
-        for concertLink in links:
-            self.driver.get(concertLink)
+        for link in links:
+            self.driver.get(link)
             try:
                 element = self.driver.find_element(By.XPATH, "//span[contains(@class, 'a-pagination_loadMoreLabel') and contains(text(), 'Покажи още')]")
                 element.click()
