@@ -42,11 +42,12 @@ def main():
     ctrl = Controler()
 
     #UI MAGIC
-    ctrl.setPreference(Preference("Concerts", "София", "12.06.2023", "evening", 0))
+    ctrl.setPreference(Preference("concert", "София", "12.06.2023", "evening", 0))
     events = ctrl.getEvents()
 
     #UI MAGIC
     chosenEvent = (EventimEvent)(events[0]).link
+    print(events[0])
 
     # call to reservation engine to open the link
 

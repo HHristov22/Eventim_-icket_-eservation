@@ -15,7 +15,7 @@ from EventExtractor.booking_constants import PAGE_NAME, ACCEPT, EVENTS, LIST_OF_
 
 class Extractor:
     
-    def __init__(self, driver, database: Database):
+    def __init__(self, driver : webdriver.Chrome, database: Database):
         self.driver = driver
         self.database = database
         
@@ -125,7 +125,19 @@ class Extractor:
         prices = [re.findall(r'\d+', s)[0] for s in stringPrices]
 
         return max(prices)            
-        
+    
+    def __noEventsInPage(self) :
+        try:
+            elements = self.driver.find_elements(By.CLASS_NAME, "m-blockNotice")
+            for element in elements :
+                if element.text == "По Вашите критерии не бяха намерени резултати" :
+                    return True       
+
+        except NoSuchElementException:
+            pass
+
+        return False
+
     def __saveEventsOfType(self, links, event_type): # links - contanis all links for different type in one category
         events_links = [] 
         events_names = []
@@ -135,11 +147,19 @@ class Extractor:
         
         for link in links:
             self.driver.get(link)
+            
+            if self.__noEventsInPage() :
+                print("There are no events on this page!")
+                continue
+
+            self.driver.implicitly_wait(2)
             try:
-                element = self.driver.find_element(By.XPATH, "//span[contains(@class, 'a-pagination_loadMoreLabel') and contains(text(), 'Покажи още')]")
-                element.click()
+                element = self.driver.find_elements(By.CLASS_NAME, "a-pagination_loadMoreLabel")
+                if len(element) > 0 and element[0].text == "Покажи още" :
+                    element[0].click()
             except NoSuchElementException:
                 print("All elements in page are loaded!")
+            self.driver.implicitly_wait(10)
             
             # Extract names
             h3_elements = self.driver.find_elements(By.TAG_NAME, "h3")
@@ -155,8 +175,15 @@ class Extractor:
             
             # Extract links
             elements = self.driver.find_elements(By.TAG_NAME, 'a')
-            events_links.extend(tag.get_attribute("href") for tag in elements 
-                                if tag.get_attribute("href") and 'event' in tag.get_attribute("href") and 'bileti' in tag.get_attribute("href"))
+
+            for tag in elements :
+                try :
+                    tagAttribute = tag.get_attribute("href")
+                except :
+                    continue
+
+                if tagAttribute and 'event' in tagAttribute and 'bileti' in tagAttribute :
+                    events_links.extend(tagAttribute)
         
         # extract max prices
         for i in range(0, len(events_links)):
@@ -164,31 +191,28 @@ class Extractor:
         
         for name, location, dateAndTime, maxPrice, link in zip(events_names, events_locations, events_datesAndTimes, events_maxPrices, events_links):
             newEvenet = EventimEvent(name, event_type, location, dateAndTime, maxPrice, link)
-            print(newEvenet)
             self.database.insertEventimEvent(newEvenet)
 
     def saveEvenetsOfPrefferedTypes(self):
-        prefferedType = self.database.getPreference()
-        #prefferedType = ['', 'concert']
-        # prefferedType[1] = 'concert'
+        prefferedType = self.database.getPreference().types[0]
         
-        if prefferedType[1]  == 'concert':
+        if prefferedType  == 'concert':
             concertLinks = self.extractAllLinksForConcerts()
             self.__saveEventsOfType(concertLinks, 'concert')
             
-        elif prefferedType[1]  == 'family':
+        elif prefferedType  == 'family':
             familyLinks = self.extractAllLinksForFamily()
             self.__saveEventsOfType(familyLinks, 'family')
             
-        elif prefferedType[1]  == 'culture':
+        elif prefferedType  == 'culture':
             cultureLinks = self.extractAllLinksForCulture()
             self.__saveEventsOfType(cultureLinks, 'culture')
             
-        elif prefferedType[1]  == 'sport':
+        elif prefferedType  == 'sport':
             sportLinks = self.extractAllLinksForSport()
             self.__saveEventsOfType(sportLinks, 'sport')
 
-        elif prefferedType[1]  == 'other':
+        elif prefferedType  == 'other':
             otherLinks = self.extractAllLinksForOther()
             self.__saveEventsOfType(otherLinks, 'other')
 
