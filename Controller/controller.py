@@ -22,20 +22,9 @@ class Controler :
         self.db.setPreference(pref)
 
     def getEvents(self) -> list :
-        self.__startEventExtractor()
-        return self.db.getAllEventimEvent()
-
-    def __startEventExtractor(self) :
-        options = Options()
-        options.add_experimental_option("detach", True)
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-        driver.implicitly_wait(10)  
-        
-        extractor = Extractor(driver, self.db)
+        extractor = Extractor(self.db)
         extractor.saveEvenetsOfPrefferedTypes()
-
-        driver.close()
+        return self.db.getAllEventimEvent()
 
 def main():
     

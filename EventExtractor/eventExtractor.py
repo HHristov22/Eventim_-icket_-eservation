@@ -13,11 +13,21 @@ from data_types import EventimEvent
 from Database.database_manager import Database
 from EventExtractor.booking_constants import PAGE_NAME, ACCEPT, EVENTS, LIST_OF_LINKS
 
+DEFAULT_WAIT_TIME = 10
+
+# Extracts events from the site based on the preferences
+# The Database acts as a input/output from it the preferences are taken and into it the events are inserted
 class Extractor:
-    
-    def __init__(self, driver : webdriver.Chrome, database: Database):
-        self.driver = driver
+    def __init__(self, database : Database) :
         self.database = database
+
+    def __createWebDriver(self) :
+        options = Options()
+        options.add_experimental_option("detach", True)
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_argument('--headless=new')
+        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        self.driver.implicitly_wait(DEFAULT_WAIT_TIME)
         
     def __connectWithWebPage(self):
         self.driver.get(PAGE_NAME)
@@ -159,7 +169,7 @@ class Extractor:
                     element[0].click()
             except NoSuchElementException:
                 print("All elements in page are loaded!")
-            self.driver.implicitly_wait(10)
+            self.driver.implicitly_wait(DEFAULT_WAIT_TIME)
             
             # Extract names
             h3_elements = self.driver.find_elements(By.TAG_NAME, "h3")
@@ -193,7 +203,9 @@ class Extractor:
             newEvenet = EventimEvent(name, event_type, location, dateAndTime, maxPrice, link)
             self.database.insertEventimEvent(newEvenet)
 
-    def saveEvenetsOfPrefferedTypes(self):
+    def saveEvenetsOfPrefferedTypes(self) :
+        self.__createWebDriver()
+
         prefferedType = self.database.getPreference().types[0]
         
         if prefferedType  == 'concert':
@@ -215,22 +227,5 @@ class Extractor:
         elif prefferedType  == 'other':
             otherLinks = self.extractAllLinksForOther()
             self.__saveEventsOfType(otherLinks, 'other')
-
-
-
-
-
-def main():
-    options = Options()
-    options.add_experimental_option("detach", True)
-    options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    driver.implicitly_wait(10)  
-
-    extractor = Extractor (driver)
-    extractor.saveEvenetsOfPrefferedTypes()
-
-    driver.close()
-
-if __name__ == "__main__":
-    main()  
+        
+        self.driver.close()
