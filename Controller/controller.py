@@ -4,6 +4,7 @@ from Database.database_manager import Database
 from data_types import Preference
 from data_types import EventimEvent
 from EventExtractor.eventExtractor import Extractor
+from ReservationEngine.Booking import Booking
 
 #those should be deleted
 from selenium import webdriver
@@ -21,25 +22,31 @@ class Controler :
     def setPreference(self, pref : Preference) :
         self.db.setPreference(pref)
 
-    def getEvents(self) -> list :
+    def getEvents(self) -> list[EventimEvent] :
+        self.db.deleteAllEventimEvents()
         extractor = Extractor(self.db)
         extractor.saveEvenetsOfPrefferedTypes()
         return self.db.getAllEventimEvent()
+    
+    def pickEvent(self, link : str) :
+        booking = Booking()
+        booking.openLink(link)
+
 
 def main():
     
     ctrl = Controler()
 
     #UI MAGIC
-    ctrl.setPreference(Preference("concert", "София", "12.06.2023", "evening", 0))
+    ctrl.setPreference(Preference("other", "София", "12.06.2023", "evening", 0))
     events = ctrl.getEvents()
 
-    #UI MAGIC
-    chosenEvent = (EventimEvent)(events[0]).link
-    print(events[0])
+    for event in events :
+        print(events.index(event), " - ", event.name)
 
-    # call to reservation engine to open the link
+    pickIndex = int(input())
 
+    ctrl.pickEvent(events[pickIndex].link)
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 import time
 import re
 import sys
@@ -14,12 +15,46 @@ from Database.database_manager import Database
 from EventExtractor.booking_constants import PAGE_NAME, ACCEPT, EVENTS, LIST_OF_LINKS
 
 DEFAULT_WAIT_TIME = 10
+SMALL_WAIT_TIME = 2
+
+LINK_IDENTIFIERS_CONCERTS = ['concerts', 'muzika/narodna_muzika']
+LINK_IDENTIFIERS_CULTURE = ['kultura']
+LINK_IDENTIFIERS_SPORT = ['sport']
+LINK_IDENTIFIERS_FAMILY = ['semeistvo', 'zabavlenija_razni', 'panair', 'party']
+LINK_IDENTIFIERS_OTHER= ['drugi']
 
 # Extracts events from the site based on the preferences
 # The Database acts as a input/output from it the preferences are taken and into it the events are inserted
 class Extractor:
     def __init__(self, database : Database) :
         self.database = database
+
+    def saveEvenetsOfPrefferedTypes(self) :
+        self.__createWebDriver()
+
+        prefferedType = self.database.getPreference().types[0]
+        
+        if prefferedType  == 'concert':
+            concertLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_CONCERTS)
+            self.__saveEventsOfType(concertLinks, 'concert')
+            
+        elif prefferedType  == 'family':
+            familyLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_FAMILY)
+            self.__saveEventsOfType(familyLinks, 'family')
+            
+        elif prefferedType  == 'culture':
+            cultureLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_CULTURE)
+            self.__saveEventsOfType(cultureLinks, 'culture')
+            
+        elif prefferedType  == 'sport':
+            sportLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_SPORT)
+            self.__saveEventsOfType(sportLinks, 'sport')
+
+        elif prefferedType  == 'other':
+            otherLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_OTHER)
+            self.__saveEventsOfType(otherLinks, 'other')
+        
+        self.driver.close()
 
     def __createWebDriver(self) :
         options = Options()
@@ -53,89 +88,44 @@ class Extractor:
         except NoSuchElementException:
             print("events link not found")
             return None
-        
-    def extractAllLinksForConcerts(self) -> list:
-        self.__openEventsMenu()
-        li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
-        
-        links = []
-        for li in li_elements:
-            a = li.find_element(By.CSS_SELECTOR, 'a')
-            link = a.get_attribute('href')
-            if(link not in LIST_OF_LINKS):
-                if('concerts' in link or 'muzika/narodna_muzika' in link):
-                    links.append(link)
-        
-        return links
-    
-    def extractAllLinksForCulture(self) -> list:
-        self.__openEventsMenu()
-        li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
-        
-        links = []
-        for li in li_elements:
-            a = li.find_element(By.CSS_SELECTOR, 'a')
-            link = a.get_attribute('href')
-            if(link not in LIST_OF_LINKS):
-                if('kultura' in link in link):
-                    links.append(link)
-        
-        return links    
-    
-    def extractAllLinksForSport(self) -> list:
-        self.__openEventsMenu()
-        li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
-        
-        links = []
-        for li in li_elements:
-            a = li.find_element(By.CSS_SELECTOR, 'a')
-            link = a.get_attribute('href')
-            if(link not in LIST_OF_LINKS):
-                if('sport' in link in link):
-                    links.append(link)
-        
-        return links   
-    
-    def extractAllLinksForFamily(self) -> list:
-        self.__openEventsMenu()
-        li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
-        
-        links = []
-        for li in li_elements:
-            a = li.find_element(By.CSS_SELECTOR, 'a')
-            link = a.get_attribute('href')
-            if(link not in LIST_OF_LINKS):
-                if('semeistvo' in link or 'zabavlenija_razni' in link or 'panair' in link or 'party' in link):
-                    links.append(link)
-        
-        return links
-    
-    def extractAllLinksForOther(self) -> list:
-        self.__openEventsMenu()
-        li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
-        
-        links = []
-        for li in li_elements:
-            a = li.find_element(By.CSS_SELECTOR, 'a')
-            link = a.get_attribute('href')
-            if(link not in LIST_OF_LINKS):
-                if('drugi' in link and not 'zabavlenija_razni' in link and not 'drugi_sportni_subitiya' in link):
-                    links.append(link)
-        
-        return links
-    
-    def __maxPrice(self, event_link):
-        self.driver.get(event_link)
-        time.sleep(3)  # Wait for 3 seconds
-        button = self.driver.find_element(By.XPATH, '//*[@id="event_page"]/div[2]/article/div/div[2]/div/div/a/div[3]/button')
-        button.click()
-        elements = self.driver.find_elements(By.CSS_SELECTOR, ".o-singleTicketTypeSelection__options .m-priceLevel__title.-alternative")
-        
-        stringPrices = [element.text for element in elements]
-        prices = [re.findall(r'\d+', s)[0] for s in stringPrices]
 
-        return max(prices)            
+    def __extractAllLinksFor(self, identifiers) :
+        self.__openEventsMenu()
+        li_elements = self.driver.find_elements(By.CSS_SELECTOR, 'li.m-mainMenu__listItemSubListItem')
+        
+        links = []
+        for li in li_elements :
+            a = li.find_element(By.CSS_SELECTOR, 'a')
+            link = a.get_attribute('href')
+            if link not in LIST_OF_LINKS :
+                for identifier in identifiers :
+                    if identifier in link :
+                        links.append(link)
+                        break
+        
+        return links
     
+    def __saveEventsOfType(self, links, event_type): # links - contanis all links for different type in one category
+
+        events = []
+        
+        for link in links :
+            self.driver.get(link)
+            
+            if self.__noEventsInPage() :
+                continue
+
+            self.__loadMoreElementsIfAvailable()
+            
+            eventListItems = self.driver.find_elements(By.CLASS_NAME, "m-eventListItem")
+            for item in eventListItems :
+                eventimEvent = self.__processEventListItem(item)
+                eventimEvent.type = event_type
+                events.append(eventimEvent)  
+
+        for event in events :
+            self.database.insertEventimEvent(event)
+
     def __noEventsInPage(self) :
         try:
             elements = self.driver.find_elements(By.CLASS_NAME, "m-blockNotice")
@@ -147,85 +137,29 @@ class Extractor:
             pass
 
         return False
+    
+    def __loadMoreElementsIfAvailable(self) :
+        # When there is no label it takes a lot of time to load, that's why a smaller wait time is set to not waste time
+        self.driver.implicitly_wait(SMALL_WAIT_TIME)
+        try:
+            element = self.driver.find_element(By.CLASS_NAME, "a-pagination_loadMoreLabel")
+            if len(element) > 0 and element.text == "Покажи още" :
+                element.click()
+        except :
+            pass
+        self.driver.implicitly_wait(DEFAULT_WAIT_TIME)
+    
+    def __processEventListItem(self, item : WebElement) -> EventimEvent:
+        nameElement = item.find_element(By.CLASS_NAME, "m-eventListItem__title")
+        name = nameElement.get_attribute("innerHTML")
 
-    def __saveEventsOfType(self, links, event_type): # links - contanis all links for different type in one category
-        events_links = [] 
-        events_names = []
-        events_locations = []
-        events_datesAndTimes = []
-        events_maxPrices = []
-        
-        for link in links:
-            self.driver.get(link)
-            
-            if self.__noEventsInPage() :
-                print("There are no events on this page!")
-                continue
+        venueElement = item.find_element(By.CLASS_NAME, "m-eventListItem__venue")
+        addressElement = item.find_element(By.CLASS_NAME, "m-eventListItem__address")
+        location = venueElement.text + " " + addressElement.text
 
-            self.driver.implicitly_wait(2)
-            try:
-                element = self.driver.find_elements(By.CLASS_NAME, "a-pagination_loadMoreLabel")
-                if len(element) > 0 and element[0].text == "Покажи още" :
-                    element[0].click()
-            except NoSuchElementException:
-                print("All elements in page are loaded!")
-            self.driver.implicitly_wait(DEFAULT_WAIT_TIME)
-            
-            # Extract names
-            h3_elements = self.driver.find_elements(By.TAG_NAME, "h3")
-            events_names.extend(element.get_attribute("innerHTML") for element in h3_elements)
+        dateAndTimeElement = item.find_element(By.CSS_SELECTOR, "*[itemprop='startDate']")
+        dateAndTime = dateAndTimeElement.get_attribute("content").replace("T", " ", 1)
+    
+        linkElement = item.get_attribute('href')
 
-            # Extract locations
-            elements = self.driver.find_elements(By.CLASS_NAME, "m-eventListItem__venue")
-            events_locations.extend(element.text for element in elements)
-
-            # Extract dates and times
-            elements = self.driver.find_elements(By.CSS_SELECTOR, "*[itemprop='startDate']")
-            events_datesAndTimes.extend(element.get_attribute("content") for element in elements)
-            
-            # Extract links
-            elements = self.driver.find_elements(By.TAG_NAME, 'a')
-
-            for tag in elements :
-                try :
-                    tagAttribute = tag.get_attribute("href")
-                except :
-                    continue
-
-                if tagAttribute and 'event' in tagAttribute and 'bileti' in tagAttribute :
-                    events_links.extend(tagAttribute)
-        
-        # extract max prices
-        for i in range(0, len(events_links)):
-            events_maxPrices.append(0)        
-        
-        for name, location, dateAndTime, maxPrice, link in zip(events_names, events_locations, events_datesAndTimes, events_maxPrices, events_links):
-            newEvenet = EventimEvent(name, event_type, location, dateAndTime, maxPrice, link)
-            self.database.insertEventimEvent(newEvenet)
-
-    def saveEvenetsOfPrefferedTypes(self) :
-        self.__createWebDriver()
-
-        prefferedType = self.database.getPreference().types[0]
-        
-        if prefferedType  == 'concert':
-            concertLinks = self.extractAllLinksForConcerts()
-            self.__saveEventsOfType(concertLinks, 'concert')
-            
-        elif prefferedType  == 'family':
-            familyLinks = self.extractAllLinksForFamily()
-            self.__saveEventsOfType(familyLinks, 'family')
-            
-        elif prefferedType  == 'culture':
-            cultureLinks = self.extractAllLinksForCulture()
-            self.__saveEventsOfType(cultureLinks, 'culture')
-            
-        elif prefferedType  == 'sport':
-            sportLinks = self.extractAllLinksForSport()
-            self.__saveEventsOfType(sportLinks, 'sport')
-
-        elif prefferedType  == 'other':
-            otherLinks = self.extractAllLinksForOther()
-            self.__saveEventsOfType(otherLinks, 'other')
-        
-        self.driver.close()
+        return EventimEvent(name, "", location, dateAndTime, "None", linkElement)
