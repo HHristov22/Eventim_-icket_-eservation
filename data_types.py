@@ -72,21 +72,16 @@ class EventimEvent :
 '''
 Preference: 
 types - List of types/genres of events
-    example(["Комедия", "Метъл", "Театър"]) // These should be taken from the site's "Събития" menu
+    example(["culture", "family"]) // Available genres are: concert, family, culture, sport, other
 locations - List of cities
     example(["Sofia", "София", "Пловдив"]) // Best add both Latin alphabet and Cyrillic alphabet variations for the names of the cities
 dates - List of dates
     example(["15.06.2023", "21.05.2022", "03.12.2023"])
-dayParts - List of parts of the day - each part can be one of [DAY_PART_MORNING, DAY_PART_MID_DAY, DAY_PART_AFTERNOON, DAY_PART_EVENING]
-    example([MORNING, MID_DAY]) - this is from 06.00 to 16.00
-    example([MID_DAY, EVENING]) - this is from 06.00 to 12.00 and from 18.00 to 24.00 
-maxPrice - The biggest price that the user is willing to pay
+dayParts - List of parts of the day - Available day parts are: morning, midday, afternoon, evening
+    example([morning, midday]) - this is from 06.00 to 16.00
+    example([midday, evening]) - this is from 06.00 to 12.00 and from 18.00 to 24.00 
+maxPrice - The biggest price that the user is willing to pay - This is currently not used
 '''
-
-DAY_PART_MORNING = "morning" # 06.00 - 12.00
-DAY_PART_MID_DAY = "midday" # 11.00 - 16.00
-DAY_PART_AFTERNOON = "afternoon" # 15.00 - 19.00
-DAY_PART_EVENING = "evening" # 18.00 - 24.00
 
 class Preference :
 
