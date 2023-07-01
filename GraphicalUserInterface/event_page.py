@@ -31,10 +31,10 @@ class EventPage(tk.Frame):
         self.submit_button.pack(pady=2)
         self.back_button.pack(pady=2)
 
-        self.populate_event_dropdown()
+        self.populateEventDropdown()
         self.populate_ticket_dropdown()
     
-    def populate_event_dropdown(self):
+    def populateEventDropdown(self):
         # Placeholder implementation to populate the event dropdown
         events = ["Event 1", "Event 2", "Event 3"]
         self.event_var.set(events[0])  # Set default value
