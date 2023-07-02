@@ -1,6 +1,6 @@
 # Dosen't use
 import tkinter as tk
-from json_handler import read_users, write_users, encrypt_password
+from json_handler import readUsers, writeUsers, encryptPassword
 
 class RegistrationPage(tk.Frame):
     def __init__(self, parent, login_page):
@@ -39,7 +39,7 @@ class RegistrationPage(tk.Frame):
             tk.messagebox.showerror("Registration Failed", "Passwords do not match")
             return
 
-        users = read_users()
+        users = readUsers()
         for user in users:
             if user["username"] == username:
                 tk.messagebox.showerror("Registration Failed", "Username already exists")
@@ -47,11 +47,11 @@ class RegistrationPage(tk.Frame):
 
         new_user = {
             "username": username,
-            "password": encrypt_password(password)
+            "password": encryptPassword(password)
         }
 
         users.append(new_user)
-        write_users(users)
+        writeUsers(users)
 
         tk.messagebox.showinfo("Registration Successful", "Registered successfully! You can now login.")
 

@@ -14,12 +14,12 @@ class Application(tk.Tk):
         # self.login_page = LoginPage(self, self.show_registration)
         # self.registration_page = RegistrationPage(self, self.show_login)
         # self.event_page = EventPage(self, self.show_event_page)
-        self.preferences_page = PeferencesPage(self, self.show_preferences)
+        self.preferences_page = PeferencesPage(self, self.showPreferences)
         
         # self.show_login()
-        self.show_preferences()
+        self.showPreferences()
 
-    def show_preferences(self):
+    def showPreferences(self):
         # self.registration_page.grid_remove()
         self.preferences_page.grid()
         
@@ -35,10 +35,10 @@ class Application(tk.Tk):
     #     self.login_page.grid_remove()
     #     self.event_page.grid()
 
-    def show_info_message(self, title, message):
+    def showInfoMessage(self, title, message):
         messagebox.showinfo(title, message)
 
-    def show_error_message(self, title, message):
+    def showErrorMessage(self, title, message):
         messagebox.showerror(title, message)
 
 if __name__ == "__main__":

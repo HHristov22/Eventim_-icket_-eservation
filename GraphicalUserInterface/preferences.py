@@ -100,5 +100,5 @@ class PeferencesPage(tk.Frame):
         )
         self.label.pack()
 
-    def search_events(self):
+    def searchEvents(self):
         pass

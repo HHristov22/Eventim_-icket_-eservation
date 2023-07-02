@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime
-from json_handler import write_event_data
+from json_handler import writeEventData
 
 class EventPage(tk.Frame):
     def __init__(self, parent, back_callback):
@@ -20,7 +20,7 @@ class EventPage(tk.Frame):
         self.start_date_entry = tk.Entry(self, textvariable=self.start_date_var)
         self.end_date_entry = tk.Entry(self, textvariable=self.end_date_var)
         self.ticket_dropdown = tk.OptionMenu(self, self.ticket_var, "")
-        self.submit_button = tk.Button(self, text="Submit", command=self.submit_data)
+        self.submit_button = tk.Button(self, text="Submit", command=self.submitData)
         self.back_button = tk.Button(self, text="Back", command=self.back_callback)
 
         self.event_dropdown.pack(pady=2)
@@ -32,7 +32,7 @@ class EventPage(tk.Frame):
         self.back_button.pack(pady=2)
 
         self.populateEventDropdown()
-        self.populate_ticket_dropdown()
+        self.populateTicketDropdown()
     
     def populateEventDropdown(self):
         # Placeholder implementation to populate the event dropdown
@@ -41,12 +41,12 @@ class EventPage(tk.Frame):
         menu = self.event_dropdown["menu"]
         menu.delete(0, "end")
         for event in events:
-            menu.add_command(label=event, command=lambda value=event: self.update_selected_event(value))
+            menu.add_command(label=event, command=lambda value=event: self.updateSelectedEvent(value))
 
-    def update_selected_event(self, event):
+    def updateSelectedEvent(self, event):
         self.event_label.config(text="Event: " + event)
 
-    def populate_ticket_dropdown(self):
+    def populateTicketDropdown(self):
         # Placeholder implementation to populate the ticket dropdown
         tickets = [1, 2, 3, 4, 5, 6, 7, 8]
         self.ticket_var.set(tickets[0])  # Set default value
@@ -55,7 +55,7 @@ class EventPage(tk.Frame):
         for ticket in tickets:
             menu.add_command(label=ticket, command=lambda value=ticket: self.ticket_var.set(value))
 
-    def submit_data(self):
+    def submitData(self):
         event = self.event_var.get()
         start_date = self.start_date_var.get()
         end_date = self.end_date_var.get()
@@ -85,7 +85,7 @@ class EventPage(tk.Frame):
             }
 
             # Save the data to a JSON file
-            write_event_data(data)
+            writeEventData(data)
 
             messagebox.showinfo("Data Saved", "Event data has been saved successfully!")
         else:
