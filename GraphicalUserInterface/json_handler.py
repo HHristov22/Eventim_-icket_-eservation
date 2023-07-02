@@ -3,7 +3,7 @@ import hashlib
 
 USERS_FILE = "./GraphicalUserInterface/users.json"
 
-def read_users():
+def readUsers():
     try:
         with open(USERS_FILE, "r") as file:
             users = json.load(file)
@@ -12,16 +12,16 @@ def read_users():
     
     return users
 
-def write_users(users):
+def writeUsers(users):
     with open(USERS_FILE, "w") as file:
         json.dump(users, file, indent=4)
 
-def encrypt_password(password):
+def encryptPassword(password):
     # Encrypt the password using hashlib (e.g., SHA-256)
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     return hashed_password
 
-def write_event_data(data):
+def writeEventData(data):
     with open("event_data.json", "a") as file:
         json.dump(data, file)
         file.write("\n")
