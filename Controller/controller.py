@@ -33,7 +33,7 @@ class Controler :
         booking.openLink(link)
 
 
-def main(type: str, city: str, date: str, day_part: str, max_price: int):
+def getInformation(type: str, city: str, date: str, day_part: str, max_price: int):
     
     ctrl = Controler()
 
@@ -50,4 +50,4 @@ def main(type: str, city: str, date: str, day_part: str, max_price: int):
 
 
 if __name__ == "__main__":
-    main("other", "София", "12.06.2023", "evening", 0)  
+    getInformation("other", "София", "12.06.2023", "evening", 0)  
