@@ -1,9 +1,8 @@
 import tkinter as tk
 import tkinter.messagebox as messagebox
-# from login_page import LoginPage
-# from registration_page import RegistrationPage
-# from event_page import EventPage
 from preferences import PeferencesPage
+# from ..Controller import controller
+# from controller import getInformation
 
 class Application(tk.Tk):
     def __init__(self):
@@ -20,7 +19,8 @@ class Application(tk.Tk):
         self.show_preferences()
 
     def show_preferences(self):
-        # self.registration_page.grid_remove()
+        # self.registration_page.gri
+        # d_remove()
         self.preferences_page.grid()
         
     # def show_login(self):
