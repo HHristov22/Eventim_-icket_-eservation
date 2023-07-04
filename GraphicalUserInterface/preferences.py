@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 from tkcalendar import Calendar
-
+from datetime import datetime
+from ..Controller.controller import Controler, getInformation
 
 class PeferencesPage(tk.Frame):
     def __init__(self, parent, registration_page):
@@ -21,7 +22,7 @@ class PeferencesPage(tk.Frame):
         # city preferences
         self.city_label = tk.Label(self.left_frame, text="➤ City:")
         self.city_label.grid(row=0, column=0, padx=5)
-        self.city_list = ("Sofia", "Varna", "Plovdiv")
+        self.city_list = ("София", "Варна", "Пловдив")
         self.city_pref = ttk.OptionMenu(
             self.left_frame, self.pref_city_var, self.city_list[0], *self.city_list
         )
@@ -31,18 +32,23 @@ class PeferencesPage(tk.Frame):
         self.genre_label = tk.Label(self.left_frame, text="➤ Genre:")
         self.genre_label.grid(row=2, column=0, padx=5)
         self.genre_list = (
-            "Комедия",
-            "Театър",
-            "Балет, Танци",
-            "Опера, Оперета",
-            "Мюзикъл",
-            "Танцов спектакъл",
-            "Лекция",
-            "Летен театър",
-            "Балда, Шансон",
-            "Вариете",
-            "Ателие",
-            "Шоу",
+            "concert",
+            "family",
+            "culture",
+            "sport",
+            "other",
+            # "Комедия",
+            # "Театър",
+            # "Балет, Танци",
+            # "Опера, Оперета",
+            # "Мюзикъл",
+            # "Танцов спектакъл",
+            # "Лекция",
+            # "Летен театър",
+            # "Балда, Шансон",
+            # "Вариете",
+            # "Ателие",
+            # "Шоу",
         )
         self.genre_pref = ttk.OptionMenu(
             self.left_frame, self.pref_genre_var, self.genre_list[0], *self.genre_list
@@ -57,14 +63,16 @@ class PeferencesPage(tk.Frame):
         #     self.left_frame, self.pref_date_var, self.date_list[0], *self.date_list
         # )
         # self.date_pref.grid(row=5, column=0, padx=5)
-        self.calendar = Calendar(self.left_frame, selectmode='day', year=2020, month=5, day=22)
+        self.calendar = Calendar(
+            self.left_frame, selectmode="day", year=2020, month=5, day=22
+        )
         self.calendar.grid(row=5, column=0, padx=5)
 
         # day parts preferences
         self.day_part_label = tk.Label(self.left_frame, text="➤ Day parts:")
         self.day_part_label.grid(row=6, column=0, padx=5)
         self.day_part_list = (
-            "Morning (6-12)",
+            "Morning (06-12)",
             "Afternoon (11-16)",
             "Evening (15-19)",
             "Night (18-24)",
@@ -87,18 +95,31 @@ class PeferencesPage(tk.Frame):
         self.price_pref.grid(row=9, column=0, padx=5)
 
         # search button
-        self.search_button = tk.Button(self.left_frame, text="Search")
+        self.search_button = tk.Button(self.left_frame, text="Search", command=self.search_events)
         self.search_button.grid(row=10, column=0, padx=5, pady=5)
+        
 
         # Create a frame for the right part
         self.right_frame = tk.Frame(self, width=40, height=250)
         self.right_frame.grid(row=0, column=1, padx=10, pady=10)
 
         # Create a label in the right frame
-        self.label = tk.Label(
+        self.label_info = tk.Label(
             self.right_frame, text="Events...", width=48, height=28, relief="solid"
         )
-        self.label.pack()
+        self.label_info.pack()
 
     def search_events(self):
-        pass
+        selected_city = self.pref_city_var.get()
+        selected_genre = self.pref_genre_var.get()
+        selected_date = format_date(self.calendar.get_date())
+        selected_dayparts = self.pref_day_parts_var.get()
+        selected_max_price = self.pref_price_var.get()
+        getInformation(selected_genre, selected_city,selected_date,selected_dayparts, selected_max_price)
+        text_label_info = selected_city + "," + selected_genre + "," +selected_date + "," + selected_dayparts.split(" ")[0] + "," + str(selected_max_price)
+        self.label_info.config(text=text_label_info)
+
+def format_date(selected_date):
+    date_object = datetime.strptime(selected_date, "%m/%d/%y")
+    formatted_date = date_object.strftime("%d.%m.%Y")
+    return formatted_date
