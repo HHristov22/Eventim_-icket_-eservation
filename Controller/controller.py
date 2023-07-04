@@ -33,12 +33,12 @@ class Controler :
         booking.openLink(link)
 
 
-def main():
+def main(type: str, city: str, date: str, day_part: str, max_price: int):
     
     ctrl = Controler()
 
     #UI MAGIC
-    ctrl.setPreference(Preference("other", "София", "12.06.2023", "evening", 0))
+    ctrl.setPreference(Preference(type, city, date, day_part, max_price))
     events = ctrl.getEvents()
 
     for event in events :
@@ -50,4 +50,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()  
+    main("other", "София", "12.06.2023", "evening", 0)  
