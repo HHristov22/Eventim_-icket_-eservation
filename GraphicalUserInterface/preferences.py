@@ -2,7 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkcalendar import Calendar
 from datetime import datetime
-from ..Controller.controller import Controler, getInformation
+import sys
+sys.path.append("..")
+from Controller.controller import Controler, getInformation
 
 class PeferencesPage(tk.Frame):
     def __init__(self, parent, registration_page):
