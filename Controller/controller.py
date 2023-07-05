@@ -23,11 +23,32 @@ class Controler :
         self.db.setPreference(pref)
 
     def getEvents(self) -> list[EventimEvent] :
+        userPrefs = self.db.getPreference()
         self.db.deleteAllEventimEvents()
         extractor = Extractor(self.db)
-        extractor.saveEvenetsOfPrefferedTypes()
+        extractor.saveEvenetsOfPrefferedTypes(userPrefs)
         return self.db.getAllEventimEvent()
     
     def pickEvent(self, link : str) :
         booking = Booking()
         booking.openLink(link)
+
+
+def main():
+    
+    ctrl = Controler()
+
+    #UI MAGIC
+    ctrl.setPreference(Preference("other", "София", "31.12.2030", "evening", 0))
+    events = ctrl.getEvents()
+
+    for event in events :
+        print(events.index(event), " - ", event.name)
+
+    pickIndex = int(input())
+
+    ctrl.pickEvent(events[pickIndex].link)
+
+
+if __name__ == "__main__":
+    main()  

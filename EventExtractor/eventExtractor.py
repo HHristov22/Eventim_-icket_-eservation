@@ -5,12 +5,15 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from datetime import datetime
+
 import time
 import re
 import sys
 sys.path.append('..')
 
 from data_types import EventimEvent
+from data_types import Preference
 from Database.database_manager import Database
 from EventExtractor.booking_constants import PAGE_NAME, ACCEPT, EVENTS, LIST_OF_LINKS
 
@@ -29,30 +32,30 @@ class Extractor:
     def __init__(self, database : Database) :
         self.database = database
 
-    def saveEvenetsOfPrefferedTypes(self) :
+    def saveEvenetsOfPrefferedTypes(self, userPrefs : Preference) :
         self.__createWebDriver()
 
         prefferedType = self.database.getPreference().types[0]
         
         if prefferedType  == 'concert':
             concertLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_CONCERTS)
-            self.__saveEventsOfType(concertLinks, 'concert')
+            self.__saveEventsOfType(userPrefs, concertLinks, 'concert')
             
         elif prefferedType  == 'family':
             familyLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_FAMILY)
-            self.__saveEventsOfType(familyLinks, 'family')
+            self.__saveEventsOfType(userPrefs, familyLinks, 'family')
             
         elif prefferedType  == 'culture':
             cultureLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_CULTURE)
-            self.__saveEventsOfType(cultureLinks, 'culture')
+            self.__saveEventsOfType(userPrefs, cultureLinks, 'culture')
             
         elif prefferedType  == 'sport':
             sportLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_SPORT)
-            self.__saveEventsOfType(sportLinks, 'sport')
+            self.__saveEventsOfType(userPrefs, sportLinks, 'sport')
 
         elif prefferedType  == 'other':
             otherLinks = self.__extractAllLinksFor(LINK_IDENTIFIERS_OTHER)
-            self.__saveEventsOfType(otherLinks, 'other')
+            self.__saveEventsOfType(userPrefs, otherLinks, 'other')
         
         self.driver.close()
 
@@ -105,7 +108,7 @@ class Extractor:
         
         return links
     
-    def __saveEventsOfType(self, links, event_type): # links - contanis all links for different type in one category
+    def __saveEventsOfType(self, userPrefs : Preference, links, event_type): # links - contanis all links for different type in one category
 
         events = []
         
@@ -119,7 +122,9 @@ class Extractor:
             
             eventListItems = self.driver.find_elements(By.CLASS_NAME, "m-eventListItem")
             for item in eventListItems :
-                eventimEvent = self.__processEventListItem(item)
+                eventimEvent = self.__processEventListItem(userPrefs, item)
+                if eventimEvent is None:
+                    continue
                 eventimEvent.type = event_type
                 events.append(eventimEvent)  
 
@@ -148,8 +153,17 @@ class Extractor:
         except :
             pass
         self.driver.implicitly_wait(DEFAULT_WAIT_TIME)
+        
+    def __extractDate(self, date_string) : 
+        datetime_obj = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S%z")
+        return datetime_obj.strftime("%d.%m.%Y")
     
-    def __processEventListItem(self, item : WebElement) -> EventimEvent:
+    def __extractTime(self, time_string) :
+        datetime_obj = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S%z")
+        return datetime_obj.strftime("%H %M")
+           
+           
+    def __processEventListItem(self, userPrefs : Preference, item : WebElement) -> EventimEvent:
         nameElement = item.find_element(By.CLASS_NAME, "m-eventListItem__title")
         name = nameElement.get_attribute("innerHTML")
 
@@ -159,7 +173,14 @@ class Extractor:
 
         dateAndTimeElement = item.find_element(By.CSS_SELECTOR, "*[itemprop='startDate']")
         dateAndTime = dateAndTimeElement.get_attribute("content").replace("T", " ", 1)
-    
+        formatedDate = self.__extractDate(dateAndTime)
+        formatedTime = self.__extractTime(dateAndTime)
+        
         linkElement = item.get_attribute('href')
-
-        return EventimEvent(name, "", location, dateAndTime, "None", linkElement)
+        
+        print(formatedDate in userPrefs.dates)
+            
+        if str(formatedDate) in userPrefs.dates:
+            return EventimEvent(name, "", location, dateAndTime, "None", linkElement)
+        
+        return None
