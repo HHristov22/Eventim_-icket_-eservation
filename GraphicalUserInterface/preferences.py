@@ -54,7 +54,7 @@ class PeferencesPage(tk.Frame):
         # )
         # self.date_pref.grid(row=5, column=0, padx=5)
         self.calendar = Calendar(
-            self.left_frame, selectmode="day", year=2020, month=5, day=22
+            self.left_frame, selectmode="day", year=2023, month=7, day=6
         )
         self.calendar.grid(row=5, column=0, padx=5)
 
@@ -93,11 +93,26 @@ class PeferencesPage(tk.Frame):
         self.right_frame = tk.Frame(self, width=40, height=250)
         self.right_frame.grid(row=0, column=1, padx=10, pady=10)
 
+
+        self.scrollbar = tk.Scrollbar(self.right_frame)
+        self.text_widget = tk.Text(
+            self.right_frame, width=42, height=25, relief="solid",
+            yscrollcommand=self.scrollbar.set
+        )
+        self.scrollbar.config(command=self.text_widget.yview)
+
+        self.text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
         # Create a label in the right frame
         self.label_info = tk.Label(
             self.right_frame, text="Events...", width=48, height=28, relief="solid"
         )
-        self.label_info.pack()
+        # self.label_info.pack()
+
+    def set_label_text(self, text):
+        self.text_widget.delete("1.0", tk.END)
+        self.text_widget.insert(tk.END, text)
 
     def search_events(self):
         selected_city = self.pref_city_var.get()
@@ -105,11 +120,16 @@ class PeferencesPage(tk.Frame):
         selected_date = format_date(self.calendar.get_date())
         selected_dayparts = self.pref_day_parts_var.get()
         selected_max_price = self.pref_price_var.get()
+        self.set_label_text("Loading...")
+        print("Loading...")
         information = getInformation(selected_genre, selected_city,selected_date,selected_dayparts, selected_max_price)
         # text_label_info = selected_city + "," + selected_genre + "," +selected_date + "," + selected_dayparts.split(" ")[0] + "," + str(selected_max_price)
-        self.label_info.config(text=information)
+        # self.label_info.config(text=information)
+        self.set_label_text(information)
+        # self.text_widget.config(text=information)
 
 def format_date(selected_date):
     date_object = datetime.strptime(selected_date, "%m/%d/%y")
-    formatted_date = date_object.strftime("%d.%m.%Y")
+    formatted_date = date_object.strftime("%Y.%m.%d")
+    formatted_date = str(formatted_date).replace(".","-")
     return formatted_date
