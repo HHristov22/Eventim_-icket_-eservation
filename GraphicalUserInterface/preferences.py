@@ -17,6 +17,8 @@ class PeferencesPage(tk.Frame):
         self.pref_day_parts_var = tk.StringVar()
         self.pref_price_var = tk.IntVar()
 
+        parent.geometry("670x510")
+
         self.controller = Controler()
         self.events_list = list()
 
@@ -112,13 +114,14 @@ class PeferencesPage(tk.Frame):
         )
         # self.label_info.pack()
 
-        # Create input field for picking an event
-        self.pick_input_field = tk.Entry(self)
-        self.pick_input_field.grid(row=11, column=0, padx=5, pady=5)
-
         #Create button for picking an event
         self.pick_input_button = tk.Button(self, text="Pick event by id", command=self.pick_event)
         self.pick_input_button.grid(row=11, column=1, padx=5, pady=5)
+
+        # Create input field for picking an event
+        self.pick_input_field = tk.Entry(self)
+        self.pick_input_field.grid(row=12, column=1, padx=5, pady=5)
+
 
     def set_label_text(self, text):
         self.text_widget.delete("1.0", tk.END)
