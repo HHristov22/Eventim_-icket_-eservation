@@ -152,6 +152,5 @@ class PeferencesPage(tk.Frame):
 
 def format_date(selected_date):
     date_object = datetime.strptime(selected_date, "%m/%d/%y")
-    formatted_date = date_object.strftime("%Y.%m.%d")
-    formatted_date = str(formatted_date).replace(".","-")
+    formatted_date = date_object.strftime("%d.%m.%Y")
     return formatted_date
