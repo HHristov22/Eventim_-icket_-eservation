@@ -40,13 +40,16 @@ def getInformation(type: str, city: str, date: str, day_part: str, max_price: in
     #UI MAGIC
     ctrl.setPreference(Preference(type, city, date, day_part, max_price))
     events = ctrl.getEvents()
-
+    information = ""
     for event in events :
-        print(events.index(event), " - ", event.name)
+        # print(events.index(event), " - ", event.name)
+        information += event.name
+        information += "\n"
+        
+    return information
+    # pickIndex = int(input())
 
-    pickIndex = int(input())
-
-    ctrl.pickEvent(events[pickIndex].link)
+    # ctrl.pickEvent(events[pickIndex].link)
 
 
 if __name__ == "__main__":

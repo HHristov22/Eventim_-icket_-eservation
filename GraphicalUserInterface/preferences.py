@@ -39,18 +39,6 @@ class PeferencesPage(tk.Frame):
             "culture",
             "sport",
             "other",
-            # "Комедия",
-            # "Театър",
-            # "Балет, Танци",
-            # "Опера, Оперета",
-            # "Мюзикъл",
-            # "Танцов спектакъл",
-            # "Лекция",
-            # "Летен театър",
-            # "Балда, Шансон",
-            # "Вариете",
-            # "Ателие",
-            # "Шоу",
         )
         self.genre_pref = ttk.OptionMenu(
             self.left_frame, self.pref_genre_var, self.genre_list[0], *self.genre_list
@@ -117,9 +105,9 @@ class PeferencesPage(tk.Frame):
         selected_date = format_date(self.calendar.get_date())
         selected_dayparts = self.pref_day_parts_var.get()
         selected_max_price = self.pref_price_var.get()
-        getInformation(selected_genre, selected_city,selected_date,selected_dayparts, selected_max_price)
-        text_label_info = selected_city + "," + selected_genre + "," +selected_date + "," + selected_dayparts.split(" ")[0] + "," + str(selected_max_price)
-        self.label_info.config(text=text_label_info)
+        information = getInformation(selected_genre, selected_city,selected_date,selected_dayparts, selected_max_price)
+        # text_label_info = selected_city + "," + selected_genre + "," +selected_date + "," + selected_dayparts.split(" ")[0] + "," + str(selected_max_price)
+        self.label_info.config(text=information)
 
 def format_date(selected_date):
     date_object = datetime.strptime(selected_date, "%m/%d/%y")
