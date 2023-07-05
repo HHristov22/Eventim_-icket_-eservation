@@ -31,32 +31,3 @@ class Controler :
     def pickEvent(self, link : str) :
         booking = Booking()
         booking.openLink(link)
-
-
-def getInformation(type: str, city: str, date: str, day_part: str, max_price: int):
-    
-    ctrl = Controler()
-
-    #UI MAGIC
-    ctrl.setPreference(Preference(type, city, date, day_part, max_price))
-    events = ctrl.getEvents()
-    print("Seaching is finished.")
-    information = ""
-    # events = list(set(events))
-    for event in events :
-        print(event.name)
-    for event in events :
-        # print(events.index(event), " - ", event.name)
-        information += str(events.index(event))
-        information += " -> "
-        information += event.name
-        information += "\n"
-    
-    return information
-    # pickIndex = int(input())
-
-    # ctrl.pickEvent(events[pickIndex].link)
-
-
-if __name__ == "__main__":
-    getInformation("other", "София", "2023-06-23", "evening", 0)  

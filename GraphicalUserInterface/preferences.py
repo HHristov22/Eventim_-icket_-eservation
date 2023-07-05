@@ -4,7 +4,8 @@ from tkcalendar import Calendar
 from datetime import datetime
 import sys
 sys.path.append("..")
-from Controller.controller import Controler, getInformation
+from Controller.controller import Controler
+from data_types import Preference
 
 class PeferencesPage(tk.Frame):
     def __init__(self, parent, registration_page):
@@ -15,6 +16,9 @@ class PeferencesPage(tk.Frame):
         self.pref_date_var = tk.StringVar()
         self.pref_day_parts_var = tk.StringVar()
         self.pref_price_var = tk.IntVar()
+
+        self.controller = Controler()
+        self.events_list = list()
 
         # Create a frame for the left part
         self.left_frame = tk.Frame(self, width=200, height=500)
@@ -87,12 +91,10 @@ class PeferencesPage(tk.Frame):
         # search button
         self.search_button = tk.Button(self.left_frame, text="Search", command=self.search_events)
         self.search_button.grid(row=10, column=0, padx=5, pady=5)
-        
 
         # Create a frame for the right part
         self.right_frame = tk.Frame(self, width=40, height=250)
         self.right_frame.grid(row=0, column=1, padx=10, pady=10)
-
 
         self.scrollbar = tk.Scrollbar(self.right_frame)
         self.text_widget = tk.Text(
@@ -110,6 +112,14 @@ class PeferencesPage(tk.Frame):
         )
         # self.label_info.pack()
 
+        # Create input field for picking an event
+        self.pick_input_field = tk.Entry(self)
+        self.pick_input_field.grid(row=11, column=0, padx=5, pady=5)
+
+        #Create button for picking an event
+        self.pick_input_button = tk.Button(self, text="Pick event by id", command=self.pick_event)
+        self.pick_input_button.grid(row=11, column=1, padx=5, pady=5)
+
     def set_label_text(self, text):
         self.text_widget.delete("1.0", tk.END)
         self.text_widget.insert(tk.END, text)
@@ -122,11 +132,23 @@ class PeferencesPage(tk.Frame):
         selected_max_price = self.pref_price_var.get()
         self.set_label_text("Loading...")
         print("Loading...")
-        information = getInformation(selected_genre, selected_city,selected_date,selected_dayparts, selected_max_price)
-        # text_label_info = selected_city + "," + selected_genre + "," +selected_date + "," + selected_dayparts.split(" ")[0] + "," + str(selected_max_price)
-        # self.label_info.config(text=information)
+        new_preference = Preference(selected_genre, selected_city, selected_date, selected_dayparts, selected_max_price)
+        self.controller.setPreference(new_preference)
+        self.events_list = self.controller.getEvents()
+
+        information = ""
+        for event in self.events_list :
+            information += str(self.events_list.index(event))
+            information += " -> "
+            information += event.name
+            information += "\n"
+            
         self.set_label_text(information)
-        # self.text_widget.config(text=information)
+
+    def pick_event(self):
+        event_id = self.pick_input_field.get()
+        if str(int(event_id)) == event_id :
+            self.controller.pickEvent(self.events_list[int(event_id)].link)
 
 def format_date(selected_date):
     date_object = datetime.strptime(selected_date, "%m/%d/%y")
