@@ -32,23 +32,3 @@ class Controler :
     def pickEvent(self, link : str) :
         booking = Booking()
         booking.openLink(link)
-
-
-def main():
-    
-    ctrl = Controler()
-
-    #UI MAGIC
-    ctrl.setPreference(Preference("other", "София", "31.12.2030", "morning", 0))
-    events = ctrl.getEvents()
-
-    for event in events :
-        print(events.index(event), " - ", event.name)
-
-    pickIndex = int(input())
-
-    ctrl.pickEvent(events[pickIndex].link)
-
-
-if __name__ == "__main__":
-    main()  
