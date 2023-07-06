@@ -158,6 +158,22 @@ class Extractor:
         datetime_obj = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S%z")
         return datetime_obj.strftime("%d.%m.%Y")
            
+    def __extractTime(self, time_string) :
+        datetime_obj = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S%z")
+        return datetime_obj.strftime("%H")
+           
+    def __timeAsDayPart(self, time):
+        if time >= 6 and time <= 12:
+            return "Morning (6-12)"
+        if time >= 11 and time <= 16:
+            return "Afternoon (11-16)"
+        if time >= 15 and time <= 19:
+            return "Evening (15-19)"
+        if time >= 18 and time <= 24:
+            return "Night (18-24)"
+        
+        return ""
+    
     def __processEventListItem(self, userPrefs : Preference, item : WebElement) -> EventimEvent:
         nameElement = item.find_element(By.CLASS_NAME, "m-eventListItem__title")
         name = nameElement.get_attribute("innerHTML")
@@ -169,10 +185,12 @@ class Extractor:
         dateAndTimeElement = item.find_element(By.CSS_SELECTOR, "*[itemprop='startDate']")
         dateAndTime = dateAndTimeElement.get_attribute("content").replace("T", " ", 1)
         formatedDate = self.__extractDate(dateAndTime)
+        formatedTime = self.__timeAsDayPart(int(self.__extractTime(dateAndTime)))
         
+        print (formatedTime)
         linkElement = item.get_attribute('href')
                     
-        if str(formatedDate) in userPrefs.dates:
+        if str(formatedDate) in userPrefs.dates and formatedTime in userPrefs.dayParts:
             return EventimEvent(name, "", location, dateAndTime, "None", linkElement)            
         
         return None
