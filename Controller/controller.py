@@ -39,7 +39,7 @@ def main():
     ctrl = Controler()
 
     #UI MAGIC
-    ctrl.setPreference(Preference("other", "София", "31.12.2030", "evening", 0))
+    ctrl.setPreference(Preference("other", "София", "31.12.2030", "morning", 0))
     events = ctrl.getEvents()
 
     for event in events :
